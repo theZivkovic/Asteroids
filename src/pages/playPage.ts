@@ -3,17 +3,22 @@ import Page from "./page";
 import { createPlayerGraphics } from "../playerGraphics";
 import { createAsteroidContent } from "../graphicsContentsFactory";
 import Asteroid from "../entites/asteroid";
+import Player from "../entites/player";
 
 export default class PlayPage implements Page {
 
-    private player: Graphics = null!;
+    private player: Player = null!;
     private asteroids: Array<Asteroid> = [];
     private screen: Rectangle = null!;
 
     initialize(app: Application<Renderer>): void {
         this.screen = app.screen;
-        this.player = createPlayerGraphics({ x: app.screen.width / 2, y: app.screen.height / 2 });
-        app.stage.addChild(this.player);
+        const playerGraphics = createPlayerGraphics({ x: app.screen.width / 2, y: app.screen.height / 2 });
+        this.player = new Player(
+            playerGraphics,
+            { x: 0, y: -1 },
+            0);
+        app.stage.addChild(this.player.getGraphics());
         this.asteroids = [...Array(5).keys()].map(_ => {
             const content = createAsteroidContent(15);
             const graphics = new Graphics(content);
@@ -25,7 +30,7 @@ export default class PlayPage implements Page {
     }
 
     cleanUp(): void {
-        this.player.destroy();
+        this.player.getGraphics().destroy();
         this.asteroids.forEach(x => x.getGraphics().destroy());
     }
 
@@ -33,14 +38,28 @@ export default class PlayPage implements Page {
         this.asteroids.forEach(asteriod => {
             asteriod.advance(time.deltaTime, this.screen);
         });
+        this.player.advance(time.deltaTime, this.screen);
     }
 
     handleKeyDown(evt: KeyboardEvent): void {
-        console.log(evt);
+        if (evt.key === 'w') {
+            this.player.accelerate();
+            console.log(evt.key);
+        } else if (evt.key === 'd') {
+            this.player.startRotate(true);
+        } else if (evt.key === 'a') {
+            this.player.startRotate(false);
+        }
+
     }
 
     handleKeyUp(evt: KeyboardEvent): void {
-        console.log('key up', evt);
+        if (evt.key === 'w') {
+            this.player.slowDown();
+        }
+        else if (evt.key == 'd' || evt.key == 'a') {
+            this.player.endRotate();
+        }
     }
 
 }

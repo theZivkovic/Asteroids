@@ -39,7 +39,7 @@ export default class WelcomePage implements Page {
         }
     }
 
-    handleKeyUp(evt: KeyboardEvent): void {
+    handleKeyUp(_: KeyboardEvent): void {
     }
 
 }
