@@ -35,8 +35,12 @@ export default class PlayPage implements Page {
         });
     }
 
-    handleKeyboardEvent(evt: KeyboardEvent): void {
+    handleKeyDown(evt: KeyboardEvent): void {
+        console.log(evt);
+    }
 
+    handleKeyUp(evt: KeyboardEvent): void {
+        console.log('key up', evt);
     }
 
 }

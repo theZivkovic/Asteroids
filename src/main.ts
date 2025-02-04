@@ -12,7 +12,11 @@ import GameManager from "./gameManager";
   const gameManager = new GameManager(new WelcomePage(), app);
 
   document.addEventListener('keydown', (evt: KeyboardEvent) => {
-    gameManager.handleKeyboardEvent(evt);
+    gameManager.handleKeyDown(evt);
+  });
+
+  document.addEventListener('keyup', (evt: KeyboardEvent) => {
+    gameManager.handleKeyUp(evt);
   });
 
   // Append the application canvas to the document body

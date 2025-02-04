@@ -4,5 +4,6 @@ export default interface Page {
     initialize(app: Application<Renderer>): void;
     cleanUp(): void;
     animate(time: Ticker): void;
-    handleKeyboardEvent(evt: KeyboardEvent): void;
+    handleKeyDown(evt: KeyboardEvent): void;
+    handleKeyUp(evt: KeyboardEvent): void;
 }

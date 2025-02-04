@@ -33,11 +33,13 @@ export default class WelcomePage implements Page {
         this.pressSpaceLabel.style.fontSize = this.pressSpaceLabelInitialFontSize * Math.sin(Math.PI / 3 + this.pressSpaceLabelTimeCounter % Math.PI / 3);
     }
 
-    handleKeyboardEvent(evt: KeyboardEvent): void {
+    handleKeyDown(evt: KeyboardEvent): void {
         if (evt.code === 'Space') {
             eventEmitter.emit(Events.WELCOME_PAGE_SPACE_PRESS);
         }
+    }
 
+    handleKeyUp(evt: KeyboardEvent): void {
     }
 
 }

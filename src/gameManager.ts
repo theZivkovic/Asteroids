@@ -23,8 +23,12 @@ export default class GameManager {
         this.currentPage.animate(time);
     }
 
-    handleKeyboardEvent(evt: KeyboardEvent) {
-        this.currentPage.handleKeyboardEvent(evt);
+    handleKeyDown(evt: KeyboardEvent) {
+        this.currentPage.handleKeyDown(evt);
+    }
+
+    handleKeyUp(evt: KeyboardEvent) {
+        this.currentPage.handleKeyUp(evt);
     }
 
     handleGameEvents(app: Application<Renderer>) {
