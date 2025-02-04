@@ -26,14 +26,16 @@ export default class Asteroid {
             newPosition.y = 0;
         }
         else if (newPosition.x < 0) {
-            // todo
+            newPosition.x = (screen.height - newPosition.y) * this.direction.y / this.direction.x;
+            newPosition.y = screen.height
         }
         else if (newPosition.y > screen.height) {
             newPosition.y = screen.height - newPosition.x * this.direction.x / this.direction.y;
             newPosition.x = 0;
         }
         else if (newPosition.y < 0) {
-            // todo
+            newPosition.y = (screen.width - newPosition.x) * this.direction.x / this.direction.y;
+            newPosition.x = screen.width;
         }
 
         this.graphics.position.set(
