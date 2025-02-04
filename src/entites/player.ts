@@ -5,14 +5,18 @@ export default class Asteroid {
     private direction: PointData = null!;
     private acceleration: number = 0;
     private speed: number = 1;
+    private rotationSpeed: number = 1;
     private shouldRotate: boolean = false;
     private counterClockwiseRotation: boolean = false;
+    private initialDirection: PointData;
 
-    constructor(graphics: Graphics, direction: PointData, acceleration: number) {
+    constructor(graphics: Graphics, direction: PointData, acceleration: number, rotationSpeed: number) {
         this.graphics = graphics;
         this.direction = direction;
+        this.initialDirection = { x: direction.x, y: direction.y };
         this.acceleration = acceleration;
         this.speed = 0;
+        this.rotationSpeed = rotationSpeed;
     }
 
     getGraphics() {
@@ -39,10 +43,12 @@ export default class Asteroid {
     rotate(delta: number, counterClockwise: boolean) {
         const sign = counterClockwise ? 1 : -1;
         const angle = Math.atan2(this.direction.y, this.direction.x);
-        const newAngle = (angle + delta * sign) % (2 * Math.PI);
+        const newAngle = (angle + delta * sign * this.rotationSpeed);
         this.direction.x = Math.cos(newAngle);
         this.direction.y = Math.sin(newAngle);
-        this.graphics.rotation = newAngle;
+        const initialGraphicsRotation = Math.atan2(this.initialDirection.y, this.initialDirection.x)
+        this.graphics.rotation = newAngle - initialGraphicsRotation;
+
     }
 
     advance(delta: number, screen: Rectangle) {

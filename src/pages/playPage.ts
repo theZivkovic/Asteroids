@@ -17,7 +17,8 @@ export default class PlayPage implements Page {
         this.player = new Player(
             playerGraphics,
             { x: 0, y: -1 },
-            0);
+            0,
+            0.1);
         app.stage.addChild(this.player.getGraphics());
         this.asteroids = [...Array(5).keys()].map(_ => {
             const content = createAsteroidContent(15);
