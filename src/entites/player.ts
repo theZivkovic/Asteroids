@@ -3,9 +3,9 @@ import { Graphics, PointData, Rectangle } from "pixi.js";
 export default class Asteroid {
     private graphics: Graphics = null!;
     private direction: PointData = null!;
-    private acceleration: number = 0;
-    private speed: number = 1;
-    private rotationSpeed: number = 1;
+    private acceleration: number;
+    private speed: number;
+    private rotationSpeed: number;
     private shouldRotate: boolean = false;
     private counterClockwiseRotation: boolean = false;
     private initialDirection: PointData;
