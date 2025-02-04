@@ -9,4 +9,13 @@ const createPlayerTriangleContent = (width: number, height: number) => {
     .stroke({ color: 0xFFFFFF, pixelLine: true });
 }
 
-export { createPlayerTriangleContent }
+const createAsteroidContent = (radius: number) => {
+  return new GraphicsContext()
+    .circle(0, 0, radius)
+    .stroke({ color: 0xFFFFFF, pixelLine: true });
+}
+
+export {
+  createPlayerTriangleContent,
+  createAsteroidContent
+}
