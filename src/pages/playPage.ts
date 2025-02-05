@@ -81,12 +81,6 @@ export default class PlayPage implements Page {
         }
     }
 
-    handleMouseDown(_: MouseEvent): void {
-    }
-
-    handleMouseUp(_: MouseEvent): void {
-    }
-
     getPageId(): PageId {
         return PageId.PlayPage;
     }

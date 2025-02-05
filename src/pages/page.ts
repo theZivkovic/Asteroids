@@ -11,8 +11,6 @@ interface Page {
     animate(time: Ticker): void;
     handleKeyDown(evt: KeyboardEvent): void;
     handleKeyUp(evt: KeyboardEvent): void;
-    handleMouseDown(evt: MouseEvent): void;
-    handleMouseUp(evt: MouseEvent): void;
     getPageId(): PageId
 }
 export { type Page, PageId };

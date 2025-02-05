@@ -13,8 +13,6 @@ import GameManager from "./gameManager";
 
   document.addEventListener('keydown', (evt: KeyboardEvent) => { gameManager.handleKeyDown(evt); });
   document.addEventListener('keyup', (evt: KeyboardEvent) => { gameManager.handleKeyUp(evt); });
-  document.addEventListener('mousedown', (evt: MouseEvent) => { gameManager.handleMouseDown(evt); });
-  document.addEventListener('mouseup', (evt: MouseEvent) => { gameManager.handleMouseUp(evt); });
 
   // Append the application canvas to the document body
   document.getElementById("pixi-container")!.appendChild(app.canvas);

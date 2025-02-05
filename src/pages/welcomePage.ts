@@ -42,14 +42,6 @@ export default class WelcomePage implements Page {
     handleKeyUp(_: KeyboardEvent): void {
     }
 
-    handleMouseDown(_: MouseEvent): void {
-
-    }
-
-    handleMouseUp(_: MouseEvent): void {
-
-    }
-
     getPageId(): PageId {
         return PageId.WelcomePage;
     }

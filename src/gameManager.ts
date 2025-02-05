@@ -31,14 +31,6 @@ export default class GameManager {
         this.currentPage.handleKeyUp(evt);
     }
 
-    handleMouseDown(evt: MouseEvent) {
-        this.currentPage.handleMouseDown(evt);
-    }
-
-    handleMouseUp(evt: MouseEvent) {
-        this.currentPage.handleMouseUp(evt);
-    }
-
     handleGameEvents(app: Application<Renderer>) {
         eventEmitter.addListener(Events.WELCOME_PAGE_SPACE_PRESS, () => {
             this.changePage(new PlayPage(), app);
