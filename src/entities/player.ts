@@ -2,13 +2,6 @@ import { Graphics, PointData, Rectangle } from "pixi.js";
 import MovableEntity from "./movableEntity";
 import EntityThatPassedThroughWalls from "./entityThatPassedThroughWalls";
 
-enum ScreenSide {
-    TOP,
-    RIGHT,
-    LEFT,
-    BOTTOM
-};
-
 export default class Player {
     private acceleration: number;
     private rotationSpeed: number;
