@@ -14,19 +14,31 @@ export default class CollisionDetector {
         this.tracker.get(leftEntity)!.push(rightEntity);
     }
 
-    untrack(leftEntity: GraphicalEntity, rightEntity: GraphicalEntity) {
-        const rightEntities = this.tracker.get(leftEntity);
-        const indexToRemove = rightEntities!.indexOf(rightEntity);
-        rightEntities?.splice(indexToRemove, 1);
+    untrackRight(rightEntity: GraphicalEntity) {
+        for (const [leftEntity, rightEntities] of this.tracker) {
+            const rightEntityIndex = rightEntities.indexOf(rightEntity);
+            if (rightEntityIndex >= 0) {
+                rightEntities.splice(rightEntityIndex, 1);
+            }
+            if (rightEntities.length == 0) {
+                this.tracker.delete(leftEntity);
+            }
+        }
     }
 
-    untrackMany(leftEntity: GraphicalEntity) {
-        this.tracker.set(leftEntity, []);
+    untrackLeft(leftEntity: GraphicalEntity) {
+        this.tracker.delete(leftEntity);
     }
 
     checkCollisions() {
+        console.log(this.tracker);
         for (const [leftEntity, rightEntities] of this.tracker) {
             for (const rightEntity of rightEntities) {
+
+                if (leftEntity.getGraphics().destroyed || rightEntity.getGraphics().destroyed) {
+                    continue; // see how to remove this check (not sure why entities are not properly destroyed at this moment)
+                }
+
                 if (this.areColliding(
                     leftEntity.getGraphics().getBounds(),
                     rightEntity.getGraphics().getBounds()
@@ -36,6 +48,7 @@ export default class CollisionDetector {
                         rightEntityId: rightEntity.getId()
                     });
                 }
+
             }
         }
     }

@@ -17,6 +17,7 @@ export default class PlayPage implements Page {
     private bulletSpawner: BulletSpawner = null!;
     private bullets: Array<Bullet> = [];
     private collisionDetector = new CollisionDetector();
+    private score = 0;
 
     initialize(app: Application<Renderer>): void {
         this.app = app;
@@ -28,7 +29,7 @@ export default class PlayPage implements Page {
             0,
             0.1);
         app.stage.addChild(this.player.getGraphics());
-        this.asteroids = [...Array(5).keys()].map(_ => {
+        this.asteroids = [...Array(10).keys()].map(_ => {
             const content = createAsteroidContent(15);
             const graphics = new Graphics(content);
             graphics.position.set(Math.random() * app.screen.width, Math.random() * app.screen.height);
@@ -105,14 +106,18 @@ export default class PlayPage implements Page {
         })
     }
 
-    removeBullet(entityId: number) {
+    removeBullet(bulletToRemove: Bullet) {
+        const bulletIndex = this.bullets.indexOf(bulletToRemove);
+        if (bulletIndex < 0) { throw new Error(`can't find a bullet to remove, index: ${bulletIndex}, entityId: ${bulletToRemove.getEntityId()}`) }
+        this.bullets.splice(bulletIndex, 1);
+        this.collisionDetector.untrackLeft(bulletToRemove.getGraphicalEntity());
+        bulletToRemove.getGraphics().destroy();
+    }
+
+    removeBulletById(entityId: number) {
         const bulletToRemove = this.bullets.find(x => x.getEntityId() === entityId);
         if (!bulletToRemove) { throw new Error(`can't find a bullet to remove, entityId: ${entityId}`) }
-        const bulletIndex = this.bullets.indexOf(bulletToRemove);
-        if (bulletIndex < 0) { throw new Error(`can't find a bullet to remove, index: ${bulletIndex}, entityId: ${entityId}`) }
-        this.bullets.splice(bulletIndex, 1);
-        this.collisionDetector.untrackMany(bulletToRemove.getGraphicalEntity());
-        bulletToRemove.getGraphics().destroy();
+        this.removeBullet(bulletToRemove);
     }
 
     handleCollision(leftEntityId: number, rightEntityId: number) {
@@ -132,5 +137,18 @@ export default class PlayPage implements Page {
 
     handleBulletToAsteroidCollision(bullet: Bullet, asteroidEntityId: number) {
         console.log('Bullet hit: ', bullet.getEntityId(), asteroidEntityId);
+        const asteroid = this.asteroids.find(x => x.getEntityId() == asteroidEntityId);
+        if (asteroid == null) { throw Error('Asteroid should be hit, but it does not exist') }
+        this.score += 10;
+        console.log('Score:', this.score);
+
+        // remove asteroid
+        this.collisionDetector.untrackRight(asteroid.getGraphicalEntity());
+        const asteroidToRemoveIndex = this.asteroids.indexOf(asteroid);
+        this.asteroids.splice(asteroidToRemoveIndex, 1);
+        asteroid.getGraphics().destroy();
+
+        // // remove bullet
+        this.removeBullet(bullet);
     }
 }

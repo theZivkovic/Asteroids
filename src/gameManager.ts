@@ -53,7 +53,7 @@ export default class GameManager {
         eventEmitter.addListener(Events.BULLET_REACHED_A_WALL, ({ bulletEntityId }) => {
             if (this.currentPage.getPageId() == PageId.PlayPage) {
                 const playPage = this.currentPage as PlayPage;
-                playPage.removeBullet(bulletEntityId);
+                playPage.removeBulletById(bulletEntityId);
             }
         });
         eventEmitter.addListener(Events.COLLISION_DETECTED, ({ leftEntityId, rightEntityId }) => {
