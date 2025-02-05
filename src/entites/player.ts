@@ -1,5 +1,12 @@
 import { Graphics, PointData, Rectangle } from "pixi.js";
 
+enum ScreenSide {
+    TOP,
+    RIGHT,
+    LEFT,
+    BOTTOM
+};
+
 export default class Asteroid {
     private graphics: Graphics = null!;
     private direction: PointData = null!;
@@ -51,6 +58,16 @@ export default class Asteroid {
 
     }
 
+    calculateEntryPointOnSide(screenSide: ScreenSide, exitingPosition: PointData, screen: Rectangle, direction: PointData): PointData {
+        switch (screenSide) {
+            case ScreenSide.TOP: return { x: exitingPosition.x - exitingPosition.y * direction.x / direction.y, y: 0 };
+            case ScreenSide.LEFT: return { x: 0, y: exitingPosition.y - exitingPosition.x * direction.y / direction.x };
+            case ScreenSide.BOTTOM: return { x: exitingPosition.x + (screen.height - exitingPosition.y) * direction.x / direction.y, y: screen.height };
+            case ScreenSide.RIGHT: return { x: screen.width, y: exitingPosition.y + (screen.width - exitingPosition.x) * direction.y / direction.x };
+            default: throw new Error(`unhandled side ${screenSide}`);
+        }
+    }
+
     advance(delta: number, screen: Rectangle) {
         if (this.shouldRotate) {
             this.rotate(delta, this.counterClockwiseRotation);
@@ -72,16 +89,45 @@ export default class Asteroid {
         };
 
         if (newPosition.x > screen.width) {
-            newPosition.x = screen.width - newPosition.y * this.direction.y / this.direction.x;
-            newPosition.y = 0;
+            const intersectionCandidatesWithThreeOtherSidesOfScreen = [
+                { x: newPosition.x - newPosition.y * this.direction.x / this.direction.y, y: 0 },
+                { x: 0, y: newPosition.y - newPosition.x * this.direction.y / this.direction.x },
+                { x: newPosition.x + (screen.height - newPosition.y) * this.direction.x / this.direction.y, y: screen.height }
+            ];
+
+            const candidateWithinScreenBounds = intersectionCandidatesWithThreeOtherSidesOfScreen
+                .filter(candidate => candidate.x >= 0 && candidate.x <= screen.width &&
+                    candidate.y >= 0 && candidate.y <= screen.height)[0];
+
+            newPosition.x = candidateWithinScreenBounds.x
+            newPosition.y = candidateWithinScreenBounds.y;
         }
         else if (newPosition.x < 0) {
-            newPosition.x = (screen.height - newPosition.y) * this.direction.y / this.direction.x;
-            newPosition.y = screen.height
+            const intersectionCandidatesWithThreeOtherSidesOfScreen = [
+                { x: newPosition.x - newPosition.y * this.direction.x / this.direction.y, y: 0 },
+
+            ];
+
+            const candidateWithinScreenBounds = intersectionCandidatesWithThreeOtherSidesOfScreen
+                .filter(candidate => candidate.x >= 0 && candidate.x <= screen.width &&
+                    candidate.y >= 0 && candidate.y <= screen.height)[0];
+
+            newPosition.x = candidateWithinScreenBounds.x
+            newPosition.y = candidateWithinScreenBounds.y;
         }
         else if (newPosition.y > screen.height) {
-            newPosition.y = screen.height - newPosition.x * this.direction.x / this.direction.y;
-            newPosition.x = 0;
+            const intersectionCandidatesWithThreeOtherSidesOfScreen = [
+                { x: newPosition.x - newPosition.y * this.direction.x / this.direction.y, y: 0 },
+                { x: 0, y: newPosition.y - newPosition.x * this.direction.y / this.direction.x },
+                { x: screen.width, y: newPosition.y + (screen.width - newPosition.x) * this.direction.y / this.direction.x }
+            ];
+
+            const candidateWithinScreenBounds = intersectionCandidatesWithThreeOtherSidesOfScreen
+                .filter(candidate => candidate.x >= 0 && candidate.x <= screen.width &&
+                    candidate.y >= 0 && candidate.y <= screen.height)[0];
+
+            newPosition.x = candidateWithinScreenBounds.x
+            newPosition.y = candidateWithinScreenBounds.y;
         }
         else if (newPosition.y < 0) {
             newPosition.y = (screen.width - newPosition.x) * this.direction.x / this.direction.y;
