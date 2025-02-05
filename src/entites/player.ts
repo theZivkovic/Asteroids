@@ -68,6 +68,17 @@ export default class Asteroid {
         }
     }
 
+    calculateNewEntryPoint(possibleEntrySides: Set<ScreenSide>, exitingPosition: PointData, screen: Rectangle, direction: PointData): PointData {
+        const entryPointCandidates = [...possibleEntrySides]
+            .map(possibleEntrySide => this.calculateEntryPointOnSide(possibleEntrySide, exitingPosition, screen, this.direction));
+
+        const candidateWithinScreenBounds = entryPointCandidates
+            .filter(candidate => candidate.x >= 0 && candidate.x <= screen.width &&
+                candidate.y >= 0 && candidate.y <= screen.height)[0];
+
+        return candidateWithinScreenBounds;
+    }
+
     advance(delta: number, screen: Rectangle) {
         if (this.shouldRotate) {
             this.rotate(delta, this.counterClockwiseRotation);
@@ -89,49 +100,44 @@ export default class Asteroid {
         };
 
         if (newPosition.x > screen.width) {
-            const intersectionCandidatesWithThreeOtherSidesOfScreen = [
-                { x: newPosition.x - newPosition.y * this.direction.x / this.direction.y, y: 0 },
-                { x: 0, y: newPosition.y - newPosition.x * this.direction.y / this.direction.x },
-                { x: newPosition.x + (screen.height - newPosition.y) * this.direction.x / this.direction.y, y: screen.height }
-            ];
+            const newEntryPoint = this.calculateNewEntryPoint(new Set([
+                ScreenSide.TOP,
+                ScreenSide.LEFT,
+                ScreenSide.BOTTOM
+            ]), newPosition, screen, this.direction);
 
-            const candidateWithinScreenBounds = intersectionCandidatesWithThreeOtherSidesOfScreen
-                .filter(candidate => candidate.x >= 0 && candidate.x <= screen.width &&
-                    candidate.y >= 0 && candidate.y <= screen.height)[0];
-
-            newPosition.x = candidateWithinScreenBounds.x
-            newPosition.y = candidateWithinScreenBounds.y;
+            newPosition.x = newEntryPoint.x
+            newPosition.y = newEntryPoint.y;
         }
         else if (newPosition.x < 0) {
-            const intersectionCandidatesWithThreeOtherSidesOfScreen = [
-                { x: newPosition.x - newPosition.y * this.direction.x / this.direction.y, y: 0 },
+            const newEntryPoint = this.calculateNewEntryPoint(new Set([
+                ScreenSide.TOP,
+                ScreenSide.RIGHT,
+                ScreenSide.BOTTOM
+            ]), newPosition, screen, this.direction);
 
-            ];
-
-            const candidateWithinScreenBounds = intersectionCandidatesWithThreeOtherSidesOfScreen
-                .filter(candidate => candidate.x >= 0 && candidate.x <= screen.width &&
-                    candidate.y >= 0 && candidate.y <= screen.height)[0];
-
-            newPosition.x = candidateWithinScreenBounds.x
-            newPosition.y = candidateWithinScreenBounds.y;
+            newPosition.x = newEntryPoint.x
+            newPosition.y = newEntryPoint.y;
         }
         else if (newPosition.y > screen.height) {
-            const intersectionCandidatesWithThreeOtherSidesOfScreen = [
-                { x: newPosition.x - newPosition.y * this.direction.x / this.direction.y, y: 0 },
-                { x: 0, y: newPosition.y - newPosition.x * this.direction.y / this.direction.x },
-                { x: screen.width, y: newPosition.y + (screen.width - newPosition.x) * this.direction.y / this.direction.x }
-            ];
+            const newEntryPoint = this.calculateNewEntryPoint(new Set([
+                ScreenSide.LEFT,
+                ScreenSide.TOP,
+                ScreenSide.RIGHT
+            ]), newPosition, screen, this.direction);
 
-            const candidateWithinScreenBounds = intersectionCandidatesWithThreeOtherSidesOfScreen
-                .filter(candidate => candidate.x >= 0 && candidate.x <= screen.width &&
-                    candidate.y >= 0 && candidate.y <= screen.height)[0];
-
-            newPosition.x = candidateWithinScreenBounds.x
-            newPosition.y = candidateWithinScreenBounds.y;
+            newPosition.x = newEntryPoint.x
+            newPosition.y = newEntryPoint.y;
         }
         else if (newPosition.y < 0) {
-            newPosition.y = (screen.width - newPosition.x) * this.direction.x / this.direction.y;
-            newPosition.x = screen.width;
+            const newEntryPoint = this.calculateNewEntryPoint(new Set([
+                ScreenSide.LEFT,
+                ScreenSide.BOTTOM,
+                ScreenSide.RIGHT
+            ]), newPosition, screen, this.direction);
+
+            newPosition.x = newEntryPoint.x
+            newPosition.y = newEntryPoint.y;
         }
 
         this.graphics.position.set(
