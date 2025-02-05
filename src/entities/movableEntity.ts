@@ -19,6 +19,11 @@ export default class MovableEntity {
         return this.direction;
     }
 
+    setDirection(direction: PointData) {
+        this.direction.x = direction.x;
+        this.direction.y = direction.y;
+    }
+
     getSpeed() {
         return this.speed;
     }

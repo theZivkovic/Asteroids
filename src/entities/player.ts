@@ -45,11 +45,12 @@ export default class Player {
         const sign = counterClockwise ? 1 : -1;
         const angle = Math.atan2(this.movableEntity.getDirection().y, this.movableEntity.getDirection().x);
         const newAngle = (angle + delta * sign * this.rotationSpeed);
-        this.movableEntity.getDirection().x = Math.cos(newAngle);
-        this.movableEntity.getDirection().y = Math.sin(newAngle);
+        this.movableEntity.setDirection({
+            x: Math.cos(newAngle),
+            y: Math.sin(newAngle)
+        });
         const initialGraphicsRotation = Math.atan2(this.initialDirection.y, this.initialDirection.x)
         this.movableEntity.getGraphics().rotation = newAngle - initialGraphicsRotation;
-
     }
 
     advance(delta: number, screen: Rectangle) {
