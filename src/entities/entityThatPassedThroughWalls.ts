@@ -26,7 +26,7 @@ export default class EntityThatPassedThroughWalls {
         }
     }
 
-    calculateNewEntryPoint(possibleEntrySides: Set<ScreenSide>, exitingPosition: PointData, screen: Rectangle, direction: PointData): PointData {
+    calculateNewEntryPoint(possibleEntrySides: Set<ScreenSide>, exitingPosition: PointData, screen: Rectangle): PointData {
         const entryPointCandidates = [...possibleEntrySides]
             .map(possibleEntrySide => this.calculateEntryPointOnSide(possibleEntrySide, exitingPosition, screen, this.direction));
 
@@ -45,7 +45,7 @@ export default class EntityThatPassedThroughWalls {
                 ScreenSide.TOP,
                 ScreenSide.LEFT,
                 ScreenSide.BOTTOM
-            ]), newPosition, screen, this.direction);
+            ]), newPosition, screen);
 
             newPosition.x = newEntryPoint.x
             newPosition.y = newEntryPoint.y;
@@ -55,7 +55,7 @@ export default class EntityThatPassedThroughWalls {
                 ScreenSide.TOP,
                 ScreenSide.RIGHT,
                 ScreenSide.BOTTOM
-            ]), newPosition, screen, this.direction);
+            ]), newPosition, screen);
 
             newPosition.x = newEntryPoint.x
             newPosition.y = newEntryPoint.y;
@@ -65,7 +65,7 @@ export default class EntityThatPassedThroughWalls {
                 ScreenSide.LEFT,
                 ScreenSide.TOP,
                 ScreenSide.RIGHT
-            ]), newPosition, screen, this.direction);
+            ]), newPosition, screen);
 
             newPosition.x = newEntryPoint.x
             newPosition.y = newEntryPoint.y;
@@ -75,7 +75,7 @@ export default class EntityThatPassedThroughWalls {
                 ScreenSide.LEFT,
                 ScreenSide.BOTTOM,
                 ScreenSide.RIGHT
-            ]), newPosition, screen, this.direction);
+            ]), newPosition, screen);
 
             newPosition.x = newEntryPoint.x
             newPosition.y = newEntryPoint.y;
