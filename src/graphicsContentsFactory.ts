@@ -15,7 +15,15 @@ const createAsteroidContent = (radius: number) => {
     .stroke({ color: 0xFFFFFF, pixelLine: true });
 }
 
+const createBulletContent = (radius: number) => {
+  return new GraphicsContext()
+    .circle(0, 0, radius)
+    .stroke({ color: 0xFFFFFF, pixelLine: true })
+    .fill({ color: 0xFFFFFF });
+};
+
 export {
   createPlayerTriangleContent,
-  createAsteroidContent
+  createAsteroidContent,
+  createBulletContent
 }

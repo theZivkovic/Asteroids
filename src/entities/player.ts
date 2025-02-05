@@ -24,6 +24,10 @@ export default class Player {
         return this.movableEntity.getGraphics();
     };
 
+    getDirection() {
+        return this.movableEntity.getDirection();
+    }
+
     accelerate() {
         this.acceleration = 0.5;
     }

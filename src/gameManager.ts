@@ -1,5 +1,5 @@
 import { Application, Renderer, Ticker } from "pixi.js";
-import Page from "./pages/page";
+import { Page, PageId } from "./pages/page";
 import eventEmitter from "./eventEmitter";
 import PlayPage from "./pages/playPage";
 import Events from "./events";
@@ -31,10 +31,31 @@ export default class GameManager {
         this.currentPage.handleKeyUp(evt);
     }
 
+    handleMouseDown(evt: MouseEvent) {
+        this.currentPage.handleMouseDown(evt);
+    }
+
+    handleMouseUp(evt: MouseEvent) {
+        this.currentPage.handleMouseUp(evt);
+    }
+
     handleGameEvents(app: Application<Renderer>) {
         eventEmitter.addListener(Events.WELCOME_PAGE_SPACE_PRESS, () => {
             this.changePage(new PlayPage(), app);
             eventEmitter.removeListener(Events.WELCOME_PAGE_SPACE_PRESS);
         });
+        eventEmitter.addListener(Events.SPAWN_A_BULLET, () => {
+            if (this.currentPage.getPageId() == PageId.PlayPage) {
+                const playPage = this.currentPage as PlayPage;
+                playPage.addABullet();
+            }
+        });
+        eventEmitter.addListener(Events.BULLET_REACHED_A_WALL, ({ bulletEntityId }) => {
+            if (this.currentPage.getPageId() == PageId.PlayPage) {
+                const playPage = this.currentPage as PlayPage;
+                playPage.removeBullet(bulletEntityId);
+            }
+        });
+
     }
 }

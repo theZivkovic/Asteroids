@@ -1,5 +1,5 @@
 import { Application, BitmapText, Renderer, Ticker } from "pixi.js";
-import Page from "./page";
+import { Page, PageId } from "./page";
 import eventEmitter from "../eventEmitter";
 import Events from "../events";
 
@@ -40,6 +40,18 @@ export default class WelcomePage implements Page {
     }
 
     handleKeyUp(_: KeyboardEvent): void {
+    }
+
+    handleMouseDown(_: MouseEvent): void {
+
+    }
+
+    handleMouseUp(_: MouseEvent): void {
+
+    }
+
+    getPageId(): PageId {
+        return PageId.WelcomePage;
     }
 
 }
