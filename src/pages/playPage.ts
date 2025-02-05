@@ -33,7 +33,7 @@ export default class PlayPage implements Page {
             const content = createAsteroidContent(15);
             const graphics = new Graphics(content);
             graphics.position.set(Math.random() * app.screen.width, Math.random() * app.screen.height);
-            return new Asteroid(Entity.generateNextId(), graphics, { x: 1, y: 1 }, Math.random() * 1.0);
+            return new Asteroid(Entity.generateNextId(), graphics, { x: 1, y: 1 }, 1.0);
         });
         this.asteroids.forEach(asteroid => {
             app.stage.addChild(asteroid.getGraphics());
