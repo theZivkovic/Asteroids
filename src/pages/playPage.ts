@@ -1,8 +1,8 @@
-import { Application, Graphics, Renderer, Ticker } from "pixi.js";
+import { Application, Graphics, PointData, Renderer, Ticker } from "pixi.js";
 import { Page, PageId } from "./page";
 import { createPlayerGraphics } from "../playerGraphics";
-import { createAsteroidContent, createBulletContent } from "../graphicsContentsFactory";
-import Asteroid from "../entities/asteroid";
+import { createBulletContent } from "../graphicsContentsFactory";
+import { Asteroid, AsteroidSize } from "../entities/asteroid";
 import Player from "../entities/player";
 import BulletSpawner from "../entities/bulletSpawner";
 import Bullet from "../entities/bullet";
@@ -29,17 +29,12 @@ export default class PlayPage implements Page {
             0,
             0.1);
         app.stage.addChild(this.player.getGraphics());
-        this.asteroids = [...Array(10).keys()].map(_ => {
-            const content = createAsteroidContent(15);
-            const graphics = new Graphics(content);
-            graphics.position.set(Math.random() * app.screen.width, Math.random() * app.screen.height);
-            return new Asteroid(Entity.generateNextId(), graphics, { x: 1, y: 1 }, 1.0);
-        });
-        this.asteroids.forEach(asteroid => {
-            app.stage.addChild(asteroid.getGraphics());
-            this.collisionDetector.track(this.player.getGraphicalEntity(),
-                asteroid.getGraphicalEntity());
-        });
+        this.asteroids = [...Array(10).keys()].map(_ => this.createAsteroid(
+            AsteroidSize.BIG,
+            { x: Math.random(), y: Math.random() },
+            { x: Math.random() * app.screen.width, y: Math.random() * app.screen.height },
+            0.7 + Math.random() * 0.5
+        ));
         this.bulletSpawner = new BulletSpawner(this.player, 10);
         this.bullets = [];
 
@@ -106,6 +101,25 @@ export default class PlayPage implements Page {
         })
     }
 
+    createAsteroid(size: AsteroidSize, direction: PointData, position: PointData, speed: number) {
+        const asteroid = new Asteroid(
+            Entity.generateNextId(),
+            size,
+            direction,
+            speed
+        );
+        asteroid.getGraphics().position.set(
+            position.x,
+            position.y
+        );
+
+        this.app.stage.addChild(asteroid.getGraphics());
+        this.collisionDetector.track(
+            this.player.getGraphicalEntity(),
+            asteroid.getGraphicalEntity());
+        return asteroid;
+    }
+
     removeBullet(bulletToRemove: Bullet) {
         const bulletIndex = this.bullets.indexOf(bulletToRemove);
         if (bulletIndex < 0) { throw new Error(`can't find a bullet to remove, index: ${bulletIndex}, entityId: ${bulletToRemove.getEntityId()}`) }
@@ -118,6 +132,31 @@ export default class PlayPage implements Page {
         const bulletToRemove = this.bullets.find(x => x.getEntityId() === entityId);
         if (!bulletToRemove) { throw new Error(`can't find a bullet to remove, entityId: ${entityId}`) }
         this.removeBullet(bulletToRemove);
+    }
+
+    removeAsteroid(asteroid: Asteroid) {
+        const asteroidPosition = asteroid.getGraphics().position;
+        this.collisionDetector.untrackRight(asteroid.getGraphicalEntity());
+        const asteroidToRemoveIndex = this.asteroids.indexOf(asteroid);
+        this.asteroids.splice(asteroidToRemoveIndex, 1);
+        asteroid.getGraphics().destroy();
+
+        if (asteroid.getAsteroidSize() != AsteroidSize.SMALL) {
+
+            this.asteroids.push(this.createAsteroid(
+                Asteroid.SmallerAsteroidSize(asteroid.getAsteroidSize()),
+                asteroid.getMovableEntity().getDirection(),
+                asteroidPosition,
+                asteroid.getMovableEntity().getSpeed() * 2));
+
+            this.asteroids.push(this.createAsteroid(Asteroid.SmallerAsteroidSize(asteroid.getAsteroidSize()),
+                {
+                    x: -asteroid.getMovableEntity().getDirection().x,
+                    y: -asteroid.getMovableEntity().getDirection().y
+                },
+                asteroidPosition,
+                asteroid.getMovableEntity().getSpeed() * 2));
+        }
     }
 
     handleCollision(leftEntityId: number, rightEntityId: number) {
@@ -142,10 +181,7 @@ export default class PlayPage implements Page {
         console.log('Score:', this.score);
 
         // remove asteroid
-        this.collisionDetector.untrackRight(asteroid.getGraphicalEntity());
-        const asteroidToRemoveIndex = this.asteroids.indexOf(asteroid);
-        this.asteroids.splice(asteroidToRemoveIndex, 1);
-        asteroid.getGraphics().destroy();
+        this.removeAsteroid(asteroid);
 
         // // remove bullet
         this.removeBullet(bullet);
