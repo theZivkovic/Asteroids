@@ -8,6 +8,7 @@ import BulletSpawner from "../entities/bulletSpawner";
 import Bullet from "../entities/bullet";
 import Entity from "../entities/entity";
 import CollisionDetector from "../collisionDetector";
+import { rotateVector } from "../helpers/vectorHelpers";
 
 export default class PlayPage implements Page {
 
@@ -30,7 +31,7 @@ export default class PlayPage implements Page {
             0.1);
         app.stage.addChild(this.player.getGraphics());
         this.asteroids = [...Array(10).keys()].map(_ => this.createAsteroid(
-            AsteroidSize.BIG,
+            Math.random() > 0.5 ? AsteroidSize.BIG : AsteroidSize.MEDIUM,
             { x: Math.random(), y: Math.random() },
             { x: Math.random() * app.screen.width, y: Math.random() * app.screen.height },
             0.7 + Math.random() * 0.5
@@ -142,18 +143,15 @@ export default class PlayPage implements Page {
         asteroid.getGraphics().destroy();
 
         if (asteroid.getAsteroidSize() != AsteroidSize.SMALL) {
-
             this.asteroids.push(this.createAsteroid(
                 Asteroid.SmallerAsteroidSize(asteroid.getAsteroidSize()),
-                asteroid.getMovableEntity().getDirection(),
+                rotateVector(this.player.getDirection(), Math.PI / 4),
                 asteroidPosition,
                 asteroid.getMovableEntity().getSpeed() * 2));
 
-            this.asteroids.push(this.createAsteroid(Asteroid.SmallerAsteroidSize(asteroid.getAsteroidSize()),
-                {
-                    x: -asteroid.getMovableEntity().getDirection().x,
-                    y: -asteroid.getMovableEntity().getDirection().y
-                },
+            this.asteroids.push(this.createAsteroid(
+                Asteroid.SmallerAsteroidSize(asteroid.getAsteroidSize()),
+                rotateVector(this.player.getDirection(), -Math.PI / 4),
                 asteroidPosition,
                 asteroid.getMovableEntity().getSpeed() * 2));
         }
@@ -177,13 +175,17 @@ export default class PlayPage implements Page {
     handleBulletToAsteroidCollision(bullet: Bullet, asteroidEntityId: number) {
         const asteroid = this.asteroids.find(x => x.getEntityId() == asteroidEntityId);
         if (asteroid == null) { throw Error('Asteroid should be hit, but it does not exist') }
-        this.score += 10;
+        this.score += this.asteroidToPoints(asteroid.getAsteroidSize());
         console.log('Score:', this.score);
-
-        // remove asteroid
         this.removeAsteroid(asteroid);
-
-        // // remove bullet
         this.removeBullet(bullet);
+    }
+
+    asteroidToPoints(asteriodSize: AsteroidSize) {
+        switch (asteriodSize) {
+            case AsteroidSize.BIG: return 10;
+            case AsteroidSize.MEDIUM: return 15;
+            case AsteroidSize.SMALL: return 20;
+        }
     }
 }
