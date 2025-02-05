@@ -54,11 +54,12 @@ export default class PlayPage implements Page {
     }
 
     handleKeyDown(evt: KeyboardEvent): void {
-        if (evt.key === 'w') {
+        console.log(evt.code);
+        if (evt.key === 'w' || evt.code == 'ArrowUp') {
             this.player.accelerate();
-        } else if (evt.key === 'd') {
+        } else if (evt.key === 'd' || evt.code == 'ArrowRight') {
             this.player.startRotate(true);
-        } else if (evt.key === 'a') {
+        } else if (evt.key === 'a' || evt.code == 'ArrowLeft') {
             this.player.startRotate(false);
         } else if (evt.code == 'Space') {
             this.bulletSpawner.startShooting();
@@ -67,10 +68,10 @@ export default class PlayPage implements Page {
     }
 
     handleKeyUp(evt: KeyboardEvent): void {
-        if (evt.key === 'w') {
+        if (evt.key === 'w' || evt.code == 'ArrowUp') {
             this.player.slowDown();
         }
-        else if (evt.key == 'd' || evt.key == 'a') {
+        else if (evt.key == 'd' || evt.key == 'a' || evt.code == 'ArrowLeft' || evt.code == 'ArrowRight') {
             this.player.endRotate();
         } else if (evt.code == 'Space') {
             this.bulletSpawner.endShooting();
