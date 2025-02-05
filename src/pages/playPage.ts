@@ -1,4 +1,4 @@
-import { Application, Graphics, Rectangle, Renderer, Ticker } from "pixi.js";
+import { Application, Graphics, Renderer, Ticker } from "pixi.js";
 import { Page, PageId } from "./page";
 import { createPlayerGraphics } from "../playerGraphics";
 import { createAsteroidContent, createBulletContent } from "../graphicsContentsFactory";
@@ -64,7 +64,6 @@ export default class PlayPage implements Page {
         } else if (evt.code == 'Space') {
             this.bulletSpawner.startShooting();
         }
-
     }
 
     handleKeyUp(evt: KeyboardEvent): void {
