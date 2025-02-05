@@ -136,7 +136,6 @@ export default class PlayPage implements Page {
     }
 
     handleBulletToAsteroidCollision(bullet: Bullet, asteroidEntityId: number) {
-        console.log('Bullet hit: ', bullet.getEntityId(), asteroidEntityId);
         const asteroid = this.asteroids.find(x => x.getEntityId() == asteroidEntityId);
         if (asteroid == null) { throw Error('Asteroid should be hit, but it does not exist') }
         this.score += 10;

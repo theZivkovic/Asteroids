@@ -31,7 +31,6 @@ export default class CollisionDetector {
     }
 
     checkCollisions() {
-        console.log(this.tracker);
         for (const [leftEntity, rightEntities] of this.tracker) {
             for (const rightEntity of rightEntities) {
 
