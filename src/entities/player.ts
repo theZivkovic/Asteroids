@@ -1,6 +1,7 @@
 import { Graphics, PointData, Rectangle } from "pixi.js";
 import MovableEntity from "./movableEntity";
 import EntityThatPassedThroughWalls from "./entityThatPassedThroughWalls";
+import GraphicalEntity from "./graphicalEntity";
 
 export default class Player {
     private acceleration: number;
@@ -9,10 +10,12 @@ export default class Player {
     private counterClockwiseRotation: boolean = false;
     private initialDirection: PointData;
 
+    private graphicalEntity: GraphicalEntity;
     private movableEntity: MovableEntity;
     private entityThatPassesThroughtWalls: EntityThatPassedThroughWalls;
 
-    constructor(graphics: Graphics, direction: PointData, acceleration: number, rotationSpeed: number) {
+    constructor(entityId: number, graphics: Graphics, direction: PointData, acceleration: number, rotationSpeed: number) {
+        this.graphicalEntity = new GraphicalEntity(entityId, graphics);
         this.movableEntity = new MovableEntity(graphics, direction, 0);
         this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(graphics, direction);
         this.initialDirection = { x: direction.x, y: direction.y };
@@ -21,8 +24,12 @@ export default class Player {
     }
 
     getGraphics() {
-        return this.movableEntity.getGraphics();
+        return this.graphicalEntity.getGraphics();
     };
+
+    getGraphicalEntity() {
+        return this.graphicalEntity;
+    }
 
     getDirection() {
         return this.movableEntity.getDirection();

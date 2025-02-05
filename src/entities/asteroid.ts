@@ -1,15 +1,15 @@
 import { Graphics, PointData, Rectangle } from "pixi.js";
 import MovableEntity from "./movableEntity";
 import EntityThatPassedThroughWalls from "./entityThatPassedThroughWalls";
-import Entity from "./entity";
+import GraphicalEntity from "./graphicalEntity";
 
 export default class Asteroid {
-    private entity: Entity;
+    private graphicalEntity: GraphicalEntity;
     private movableEntity: MovableEntity;
     private entityThatPassesThroughtWalls: EntityThatPassedThroughWalls;
 
     constructor(entityId: number, graphics: Graphics, direction: PointData, speed: number) {
-        this.entity = new Entity(entityId);
+        this.graphicalEntity = new GraphicalEntity(entityId, graphics);
         this.movableEntity = new MovableEntity(graphics, direction, speed);
         this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(graphics, direction);
     }
@@ -24,6 +24,10 @@ export default class Asteroid {
     }
 
     getEntityId() {
-        return this.entity.getId();
+        return this.graphicalEntity.getId();
+    }
+
+    getGraphicalEntity() {
+        return this.graphicalEntity;
     }
 }

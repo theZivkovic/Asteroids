@@ -56,6 +56,12 @@ export default class GameManager {
                 playPage.removeBullet(bulletEntityId);
             }
         });
+        eventEmitter.addListener(Events.COLLISION_DETECTED, ({ leftEntityId, rightEntityId }) => {
+            if (this.currentPage.getPageId() == PageId.PlayPage) {
+                const playPage = this.currentPage as PlayPage;
+                playPage.handleCollision(leftEntityId, rightEntityId);
+            }
+        });
 
     }
 }

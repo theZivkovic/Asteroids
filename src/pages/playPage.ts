@@ -7,6 +7,7 @@ import Player from "../entities/player";
 import BulletSpawner from "../entities/bulletSpawner";
 import Bullet from "../entities/bullet";
 import Entity from "../entities/entity";
+import CollisionDetector from "../collisionDetector";
 
 export default class PlayPage implements Page {
 
@@ -15,11 +16,13 @@ export default class PlayPage implements Page {
     private app: Application<Renderer> = null!;
     private bulletSpawner: BulletSpawner = null!;
     private bullets: Array<Bullet> = [];
+    private collisionDetector = new CollisionDetector();
 
     initialize(app: Application<Renderer>): void {
         this.app = app;
         const playerGraphics = createPlayerGraphics({ x: app.screen.width / 2, y: app.screen.height / 2 });
         this.player = new Player(
+            Entity.generateNextId(),
             playerGraphics,
             { x: 0, y: -1 },
             0,
@@ -31,7 +34,11 @@ export default class PlayPage implements Page {
             graphics.position.set(Math.random() * app.screen.width, Math.random() * app.screen.height);
             return new Asteroid(Entity.generateNextId(), graphics, { x: 1, y: 1 }, Math.random() * 1.0);
         });
-        this.asteroids.forEach(x => app.stage.addChild(x.getGraphics()));
+        this.asteroids.forEach(asteroid => {
+            app.stage.addChild(asteroid.getGraphics());
+            this.collisionDetector.track(this.player.getGraphicalEntity(),
+                asteroid.getGraphicalEntity());
+        });
         this.bulletSpawner = new BulletSpawner(this.player, 10);
         this.bullets = [];
 
@@ -50,11 +57,11 @@ export default class PlayPage implements Page {
         this.bulletSpawner.animate(time);
         this.bullets.forEach(bullet => {
             bullet.advance(time.deltaTime, this.app.screen);
-        })
+        });
+        this.collisionDetector.checkCollisions();
     }
 
     handleKeyDown(evt: KeyboardEvent): void {
-        console.log(evt.code);
         if (evt.key === 'w' || evt.code == 'ArrowUp') {
             this.player.accelerate();
         } else if (evt.key === 'd' || evt.code == 'ArrowRight') {
@@ -93,6 +100,9 @@ export default class PlayPage implements Page {
         const bullet = new Bullet(Entity.generateNextId(), bulletGraphics, this.player.getDirection(), 5);
         this.app.stage.addChild(bullet.getGraphics());
         this.bullets.push(bullet);
+        this.asteroids.forEach(asteroid => {
+            this.collisionDetector.track(bullet.getGraphicalEntity(), asteroid.getGraphicalEntity());
+        })
     }
 
     removeBullet(entityId: number) {
@@ -101,6 +111,26 @@ export default class PlayPage implements Page {
         const bulletIndex = this.bullets.indexOf(bulletToRemove);
         if (bulletIndex < 0) { throw new Error(`can't find a bullet to remove, index: ${bulletIndex}, entityId: ${entityId}`) }
         this.bullets.splice(bulletIndex, 1);
+        this.collisionDetector.untrackMany(bulletToRemove.getGraphicalEntity());
         bulletToRemove.getGraphics().destroy();
+    }
+
+    handleCollision(leftEntityId: number, rightEntityId: number) {
+        if (leftEntityId == this.player.getGraphicalEntity().getId()) {
+            this.handlePlayerToAsteroidCollision(rightEntityId);
+        } else {
+            const bulletHit = this.bullets.find(x => x.getEntityId() == leftEntityId);
+            if (bulletHit != null) {
+                this.handleBulletToAsteroidCollision(bulletHit, rightEntityId);
+            }
+        }
+    }
+
+    handlePlayerToAsteroidCollision(asteroidEntityId: number) {
+        console.log('Asteroid hit: ', asteroidEntityId);
+    }
+
+    handleBulletToAsteroidCollision(bullet: Bullet, asteroidEntityId: number) {
+        console.log('Bullet hit: ', bullet.getEntityId(), asteroidEntityId);
     }
 }
