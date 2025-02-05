@@ -2,8 +2,8 @@ import { Application, Graphics, Rectangle, Renderer, Ticker } from "pixi.js";
 import Page from "./page";
 import { createPlayerGraphics } from "../playerGraphics";
 import { createAsteroidContent } from "../graphicsContentsFactory";
-import Asteroid from "../entites/asteroid";
-import Player from "../entites/player";
+import Asteroid from "../entities/asteroid";
+import Player from "../entities/player";
 
 export default class PlayPage implements Page {
 
