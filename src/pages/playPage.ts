@@ -50,7 +50,10 @@ export default class PlayPage implements Page {
 
     cleanUp(): void {
         this.player.destroy();
-        this.asteroids.forEach(x => x.destroy());
+        this.bullets.forEach(bullet => this.removeBullet(bullet));
+        this.asteroids.forEach(asteroid => this.removeAsteroid(asteroid));
+        this.livesLabel.getGraphics().destroy();
+        this.scoreLabel.getGraphics().destroy();
     }
 
     animate(time: Ticker): void {
@@ -136,11 +139,15 @@ export default class PlayPage implements Page {
     }
 
     removeAsteroid(asteroid: Asteroid) {
-        const asteroidPosition = asteroid.getPosition();
         this.collisionDetector.untrackRight(asteroid.getGraphicalEntity());
         const asteroidToRemoveIndex = this.asteroids.indexOf(asteroid);
         this.asteroids.splice(asteroidToRemoveIndex, 1);
         asteroid.destroy();
+    }
+
+    breakDownAsteroid(asteroid: Asteroid) {
+        const asteroidPosition = asteroid.getPosition();
+        this.removeAsteroid(asteroid);
 
         if (asteroid.getAsteroidSize() != AsteroidSize.SMALL) {
             this.asteroids.push(this.createAsteroid(
@@ -175,7 +182,7 @@ export default class PlayPage implements Page {
         const asteroid = this.asteroids.find(x => x.getEntityId() == asteroidEntityId);
         if (asteroid == null) { throw Error('Asteroid should be hit, but it does not exist') }
         this.livesLabel.updateLives(-1);
-        this.removeAsteroid(asteroid);
+        this.breakDownAsteroid(asteroid);
         this.player.startCooldown();
     }
 
@@ -183,7 +190,7 @@ export default class PlayPage implements Page {
         const asteroid = this.asteroids.find(x => x.getEntityId() == asteroidEntityId);
         if (asteroid == null) { throw Error('Asteroid should be hit, but it does not exist') }
         this.scoreLabel.updateScore(this.asteroidToPoints(asteroid.getAsteroidSize()));
-        this.removeAsteroid(asteroid);
+        this.breakDownAsteroid(asteroid);
         this.removeBullet(bullet);
     }
 

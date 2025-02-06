@@ -82,7 +82,7 @@ export default class Player {
     }
 
     startCooldown() {
-        this.cooldownTimer.restart(300);
+        this.cooldownTimer.restart(100);
     }
 
     isInCooldown() {

@@ -3,7 +3,7 @@ import { Page, PageId } from "./page";
 import eventEmitter from "../eventEmitter";
 import Events from "../events";
 
-export default class WelcomePage implements Page {
+export default class EndGamePage implements Page {
 
     private pressSpaceLabel: BitmapText = null!;
     private pressSpaceLabelInitialFontSize = 50;
@@ -11,11 +11,11 @@ export default class WelcomePage implements Page {
 
     initialize(app: Application<Renderer>): void {
         this.pressSpaceLabel = new BitmapText({
-            text: 'Press [SPACE] to start a game!',
+            text: 'Game END!\nPress [SPACE] to start a new game!',
             style: {
                 fontFamily: 'Arial',
                 fontSize: this.pressSpaceLabelInitialFontSize,
-                align: 'left',
+                align: 'center',
             },
         });
         this.pressSpaceLabel.anchor.set(0.5)

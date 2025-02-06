@@ -3,6 +3,7 @@ import { Page, PageId } from "./pages/page";
 import eventEmitter from "./eventEmitter";
 import PlayPage from "./pages/playPage";
 import Events from "./events";
+import EndGamePage from "./pages/endGamePage";
 
 export default class GameManager {
     private currentPage: Page;
@@ -32,9 +33,8 @@ export default class GameManager {
     }
 
     handleGameEvents(app: Application<Renderer>) {
-        eventEmitter.addListener(Events.WELCOME_PAGE_SPACE_PRESS, () => {
+        eventEmitter.addListener(Events.SPACE_PRESSED_FOR_GAME_START, () => {
             this.changePage(new PlayPage(), app);
-            eventEmitter.removeListener(Events.WELCOME_PAGE_SPACE_PRESS);
         });
         eventEmitter.addListener(Events.SPAWN_A_BULLET, () => {
             if (this.currentPage.getPageId() == PageId.PlayPage) {
@@ -53,6 +53,9 @@ export default class GameManager {
                 const playPage = this.currentPage as PlayPage;
                 playPage.handleCollision(leftEntityId, rightEntityId);
             }
+        });
+        eventEmitter.addListener(Events.ALL_LIVES_LOST, () => {
+            this.changePage(new EndGamePage(), app);
         });
 
     }

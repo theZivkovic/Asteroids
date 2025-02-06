@@ -1,4 +1,6 @@
 import { BitmapText } from "pixi.js";
+import eventEmitter from "../eventEmitter";
+import Events from "../events";
 
 export default class LivesLabel {
 
@@ -20,6 +22,9 @@ export default class LivesLabel {
     updateLives(deltaLives: number) {
         this.lives += deltaLives;
         this.label.text = this.generateLivesText();
+        if (this.lives == 0) {
+            eventEmitter.emit(Events.ALL_LIVES_LOST);
+        }
     }
 
     generateLivesText() {
