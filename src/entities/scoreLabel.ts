@@ -1,11 +1,11 @@
-import { Application, BitmapText, Renderer } from "pixi.js";
+import { BitmapText } from "pixi.js";
 
 export default class ScoreLabel {
 
     label: BitmapText = null!;
     score: number = 0;
 
-    initialize(app: Application<Renderer>) {
+    constructor() {
         this.label = new BitmapText({
             text: 'Score: 0',
             style: {
@@ -15,12 +15,14 @@ export default class ScoreLabel {
             },
         });
         this.label.anchor.set(0, 0);
-        this.label.position.set(5, 5);
-        app.stage.addChild(this.label);
     }
 
     updateScore(deltaScore: number) {
         this.score += deltaScore;
         this.label.text = `Score: ${this.score}`;
+    }
+
+    getGraphics() {
+        return this.label;
     }
 }

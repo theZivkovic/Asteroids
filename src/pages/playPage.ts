@@ -42,9 +42,11 @@ export default class PlayPage implements Page {
         this.bulletSpawner = new BulletSpawner(this.player, 10);
         this.bullets = [];
         this.scoreLabel = new ScoreLabel();
-        this.scoreLabel.initialize(app);
+        this.scoreLabel.getGraphics().position.set(5, 10);
+        app.stage.addChild(this.scoreLabel.getGraphics());
         this.livesLabel = new LivesLabel();
-        this.livesLabel.initialize(app);
+        this.livesLabel.getGraphics().position.set(120, 10);
+        app.stage.addChild(this.livesLabel.getGraphics());
 
     }
 
