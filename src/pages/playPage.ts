@@ -10,7 +10,7 @@ import CollisionDetector from "../collisionDetector";
 import { rotateVector } from "../helpers/vectorHelpers";
 import ScoreLabel from "../entities/scoreLabel";
 import LivesLabel from "../entities/livesLabel";
-import config from "../config";
+import { config } from "../config";
 export default class PlayPage implements Page {
 
     private player: Player = null!;
@@ -39,12 +39,13 @@ export default class PlayPage implements Page {
             config.player.maxSpeed);
 
         this.player.addToStage(app.stage);
-        this.asteroids = [...Array(10).keys()].map(_ => this.createAsteroid(
-            Math.random() > 0.5 ? AsteroidSize.BIG : AsteroidSize.MEDIUM,
-            { x: Math.random(), y: Math.random() },
-            { x: Math.random() * app.screen.width, y: Math.random() * app.screen.height },
-            0.7 + Math.random() * 0.5
-        ));
+        this.asteroids = [...Array(config.asteroids.initialCount).keys()]
+            .map(_ => this.createAsteroid(
+                Math.random() > 0.5 ? AsteroidSize.BIG : AsteroidSize.MEDIUM,
+                { x: Math.random(), y: Math.random() },
+                { x: Math.random() * app.screen.width, y: Math.random() * app.screen.height },
+                0.7 + Math.random() * 0.5
+            ));
         this.bulletSpawner = new BulletSpawner(this.player, 10);
         this.bullets = [];
         this.scoreLabel = new ScoreLabel();
@@ -114,12 +115,15 @@ export default class PlayPage implements Page {
         })
     }
 
-    createAsteroid(size: AsteroidSize, direction: PointData, position: PointData, speed: number) {
+    createAsteroid(size: AsteroidSize, direction: PointData, position: PointData, baseSpeed: number) {
         const asteroid = new Asteroid(
             Entity.generateNextId(),
+            config.asteroids.baseAsteroidWidth,
             size,
             direction,
-            speed
+            baseSpeed,
+            config.asteroids.scales,
+            config.asteroids.speeds
         );
         asteroid.setPosition({
             x: position.x,
@@ -170,13 +174,13 @@ export default class PlayPage implements Page {
                 Asteroid.SmallerAsteroidSize(asteroid.getAsteroidSize()),
                 rotateVector(this.player.getDirection(), Math.PI / 4),
                 asteroidPosition,
-                asteroid.getMovableEntity().getSpeed() * 2));
+                asteroid.getMovableEntity().getSpeed()));
 
             this.asteroids.push(this.createAsteroid(
                 Asteroid.SmallerAsteroidSize(asteroid.getAsteroidSize()),
                 rotateVector(this.player.getDirection(), -Math.PI / 4),
                 asteroidPosition,
-                asteroid.getMovableEntity().getSpeed() * 2));
+                asteroid.getMovableEntity().getSpeed()));
         }
     }
 

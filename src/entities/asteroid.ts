@@ -3,6 +3,7 @@ import MovableEntity from "./movableEntity";
 import EntityThatPassedThroughWalls from "./entityThatPassedThroughWalls";
 import GraphicalEntity from "./graphicalEntity";
 import { createCircleContent } from "../graphicsContentsFactory";
+import { AsteroidScalesConfig, AsteroidSpeedsConfig } from "../config";
 
 enum AsteroidSize {
     BIG,
@@ -16,12 +17,22 @@ class Asteroid {
     private entityThatPassesThroughtWalls: EntityThatPassedThroughWalls;
     private asteroidSize: AsteroidSize;
 
-    constructor(entityId: number, asteroidSize: AsteroidSize, direction: PointData, speed: number) {
+    constructor(entityId: number, baseAsteroidWidth: number, asteroidSize: AsteroidSize, direction: PointData, baseAsteroidSpeed: number, scales: AsteroidScalesConfig, speeds: AsteroidSpeedsConfig) {
         this.asteroidSize = asteroidSize;
-        const graphics = this.createGraphicsBySize(asteroidSize);
+        const speed = this.calculateSpeedBaseOnSize(baseAsteroidSpeed, asteroidSize, speeds);
+        const graphics = this.createGraphicsBySize(baseAsteroidWidth, asteroidSize, scales);
         this.graphicalEntity = new GraphicalEntity(entityId, graphics);
         this.movableEntity = new MovableEntity(graphics, direction, speed);
         this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(graphics, direction);
+    }
+
+    calculateSpeedBaseOnSize(baseSpeed: number, asteriodSize: AsteroidSize, speeds: AsteroidSpeedsConfig) {
+        switch (asteriodSize) {
+            case AsteroidSize.BIG: return baseSpeed * speeds.big;
+            case AsteroidSize.MEDIUM: return baseSpeed * speeds.medium;
+            case AsteroidSize.SMALL: return baseSpeed * speeds.small;
+            default: return baseSpeed;
+        }
     }
 
     addToStage(stage: Container<ContainerChild>) {
@@ -40,19 +51,19 @@ class Asteroid {
         return this.graphicalEntity.getGraphics().position;
     }
 
-    createGraphicsBySize(asteroidSize: AsteroidSize) {
-        const content = createCircleContent(30);
+    createGraphicsBySize(bigAsteroidWidth: number, asteroidSize: AsteroidSize, scales: AsteroidScalesConfig) {
+        const content = createCircleContent(bigAsteroidWidth);
         const graphics = new Graphics(content);
         switch (asteroidSize) {
             case AsteroidSize.BIG: return graphics;
             case AsteroidSize.MEDIUM: {
-                graphics.scale.x *= 0.5;
-                graphics.scale.y *= 0.5;
+                graphics.scale.x *= scales.medium;
+                graphics.scale.y *= scales.medium;
                 return graphics;
             }
             case AsteroidSize.SMALL: {
-                graphics.scale.x *= 0.3;
-                graphics.scale.y *= 0.3;
+                graphics.scale.x *= scales.small;
+                graphics.scale.y *= scales.small;
                 return graphics;
             }
             default: return graphics;
