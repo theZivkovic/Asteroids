@@ -9,6 +9,8 @@ import Bullet from "../entities/bullet";
 import Entity from "../entities/entity";
 import CollisionDetector from "../collisionDetector";
 import { rotateVector } from "../helpers/vectorHelpers";
+import ScoreLabel from "../entities/scoreLabel";
+import LivesLabel from "../entities/livesLabel";
 
 export default class PlayPage implements Page {
 
@@ -18,7 +20,8 @@ export default class PlayPage implements Page {
     private bulletSpawner: BulletSpawner = null!;
     private bullets: Array<Bullet> = [];
     private collisionDetector = new CollisionDetector();
-    private score = 0;
+    private scoreLabel = new ScoreLabel();
+    private livesLabel = new LivesLabel();
 
     initialize(app: Application<Renderer>): void {
         this.app = app;
@@ -38,6 +41,10 @@ export default class PlayPage implements Page {
         ));
         this.bulletSpawner = new BulletSpawner(this.player, 10);
         this.bullets = [];
+        this.scoreLabel = new ScoreLabel();
+        this.scoreLabel.initialize(app);
+        this.livesLabel = new LivesLabel();
+        this.livesLabel.initialize(app);
 
     }
 
@@ -163,14 +170,16 @@ export default class PlayPage implements Page {
     }
 
     handlePlayerToAsteroidCollision(asteroidEntityId: number) {
-        console.log('Asteroid hit: ', asteroidEntityId);
+        const asteroid = this.asteroids.find(x => x.getEntityId() == asteroidEntityId);
+        if (asteroid == null) { throw Error('Asteroid should be hit, but it does not exist') }
+        this.livesLabel.updateLives(-1);
+        this.removeAsteroid(asteroid);
     }
 
     handleBulletToAsteroidCollision(bullet: Bullet, asteroidEntityId: number) {
         const asteroid = this.asteroids.find(x => x.getEntityId() == asteroidEntityId);
         if (asteroid == null) { throw Error('Asteroid should be hit, but it does not exist') }
-        this.score += this.asteroidToPoints(asteroid.getAsteroidSize());
-        console.log('Score:', this.score);
+        this.scoreLabel.updateScore(this.asteroidToPoints(asteroid.getAsteroidSize()));
         this.removeAsteroid(asteroid);
         this.removeBullet(bullet);
     }
