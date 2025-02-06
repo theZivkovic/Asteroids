@@ -32,6 +32,7 @@ export default class PlayPage implements Page {
             config.player.bodyWidth,
             config.player.bodyHeight,
             config.player.bodyColor,
+            config.player.fireColor,
             config.player.cooldownColor,
             config.player.cooldownTimeMs);
 
@@ -63,12 +64,12 @@ export default class PlayPage implements Page {
 
     animate(time: Ticker): void {
         this.asteroids.forEach(asteriod => {
-            asteriod.advance(time.deltaTime, this.app.screen);
+            asteriod.advance(time, this.app.screen);
         });
         this.player.advance(time, this.app.screen);
         this.bulletSpawner.animate(time);
         this.bullets.forEach(bullet => {
-            bullet.advance(time.deltaTime, this.app.screen);
+            bullet.advance(time, this.app.screen);
         });
         this.collisionDetector.checkCollisions();
     }

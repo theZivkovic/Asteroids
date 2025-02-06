@@ -4,8 +4,9 @@ const config = {
         bodyWidth: 20,
         bodyHeight: 40,
         bodyColor: 0xFFFFFF,
-        cooldownColor: 0xFFFF00,
-        cooldownTimeMs: 3000
+        cooldownColor: 0xFF0000,
+        fireColor: 0xFFFF00,
+        cooldownTimeMs: 2000
     }
 }
 

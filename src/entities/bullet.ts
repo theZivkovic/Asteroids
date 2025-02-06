@@ -1,4 +1,4 @@
-import { Container, ContainerChild, Graphics, PointData, Rectangle } from "pixi.js";
+import { Container, ContainerChild, Graphics, PointData, Rectangle, Ticker } from "pixi.js";
 import MovableEntity from "./movableEntity";
 import eventEmitter from "../eventEmitter";
 import Events from "../events";
@@ -25,8 +25,8 @@ export default class Bullet {
         return this.graphicalEntity;
     }
 
-    advance(delta: number, screen: Rectangle,) {
-        this.movableEntity.advance(delta);
+    advance(time: Ticker, screen: Rectangle,) {
+        this.movableEntity.advance(time);
         const position = this.getGraphicalEntity().getGraphics().position;
         if (position.x >= screen.width || position.x < 0 ||
             position.y >= screen.height || position.y < 0) {

@@ -1,4 +1,4 @@
-import { Container, ContainerChild, Graphics, PointData, Rectangle } from "pixi.js";
+import { Container, ContainerChild, Graphics, PointData, Rectangle, Ticker } from "pixi.js";
 import MovableEntity from "./movableEntity";
 import EntityThatPassedThroughWalls from "./entityThatPassedThroughWalls";
 import GraphicalEntity from "./graphicalEntity";
@@ -68,8 +68,8 @@ class Asteroid {
             ;
     }
 
-    advance(delta: number, screen: Rectangle) {
-        this.movableEntity.advance(delta);
+    advance(time: Ticker, screen: Rectangle) {
+        this.movableEntity.advance(time);
         this.entityThatPassesThroughtWalls.advance(screen);
     }
 

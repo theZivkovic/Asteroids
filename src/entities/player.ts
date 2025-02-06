@@ -19,7 +19,7 @@ export default class Player {
     private playerCooldownGraphics: Graphics;
 
     constructor(entityId: number, initialPosition: PointData, direction: PointData, rotationSpeed: number,
-        bodyWidth: number, bodyHeight: number, bodyColor: number, cooldownColor: number, cooldownTimeMs: number
+        bodyWidth: number, bodyHeight: number, bodyColor: number, fireColor: number, cooldownColor: number, cooldownTimeMs: number
     ) {
         const playerGraphics = createPlayerGraphics(initialPosition, bodyWidth, bodyHeight, bodyColor);
 
@@ -28,7 +28,7 @@ export default class Player {
         this.playerCooldownGraphics.visible = false;
         playerGraphics.addChild(this.playerCooldownGraphics);
 
-        this.fireEngineGraphics = createFireEngineGraphics(bodyWidth, bodyHeight, cooldownColor);
+        this.fireEngineGraphics = createFireEngineGraphics(bodyWidth, bodyHeight, fireColor);
         playerGraphics.addChild(this.fireEngineGraphics);
 
         this.graphicalEntity = new GraphicalEntity(entityId, playerGraphics);
@@ -73,10 +73,10 @@ export default class Player {
         this.shouldRotate = false;
     }
 
-    rotate(delta: number, counterClockwise: boolean) {
+    rotate(time: Ticker, counterClockwise: boolean) {
         const sign = counterClockwise ? 1 : -1;
         const angle = Math.atan2(this.movableEntity.getDirection().y, this.movableEntity.getDirection().x);
-        const newAngle = (angle + delta * sign * this.rotationSpeed);
+        const newAngle = (angle + time.deltaTime * sign * this.rotationSpeed);
         this.movableEntity.setDirection({
             x: Math.cos(newAngle),
             y: Math.sin(newAngle)
@@ -110,7 +110,7 @@ export default class Player {
             this.fireEngineGraphics.visible = false;
         }
         if (this.shouldRotate) {
-            this.rotate(time.deltaTime, this.counterClockwiseRotation);
+            this.rotate(time, this.counterClockwiseRotation);
         }
 
         let newSpeed = this.movableEntity.getSpeed() + this.acceleration * time.deltaTime;
@@ -122,7 +122,7 @@ export default class Player {
         }
         this.movableEntity.setSpeed(newSpeed);
 
-        this.movableEntity.advance(time.deltaTime);
+        this.movableEntity.advance(time);
         this.entityThatPassesThroughtWalls.advance(screen);
     }
 }
