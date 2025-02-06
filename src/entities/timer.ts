@@ -16,14 +16,10 @@ export default class Timer {
 
     animate(deltaTime: number) {
         if (this.isRunning()) {
-            console.log(this.currentTime, '->', this.endTime);
             this.currentTime += deltaTime;
             if (this.currentTime >= this.endTime) {
                 this.stopped = true;
             }
-        }
-        else {
-            console.log('stopped');
         }
 
     }
