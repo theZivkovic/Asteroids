@@ -1,4 +1,4 @@
-import { Container, ContainerChild, Graphics, PointData, Rectangle } from "pixi.js";
+import { Container, ContainerChild, Graphics, PointData, Rectangle, Ticker } from "pixi.js";
 import MovableEntity from "./movableEntity";
 import EntityThatPassedThroughWalls from "./entityThatPassedThroughWalls";
 import GraphicalEntity from "./graphicalEntity";
@@ -18,22 +18,26 @@ export default class Player {
     private cooldownTimer: Timer;
     private playerCooldownGraphics: Graphics;
 
-    constructor(entityId: number, initialPosition: PointData, direction: PointData, acceleration: number, rotationSpeed: number) {
-        const graphics = createPlayerGraphics(initialPosition, 0xFFFFFF);
-        this.playerCooldownGraphics = createPlayerGraphics(initialPosition, 0xFF0000);
+    constructor(entityId: number, initialPosition: PointData, direction: PointData, rotationSpeed: number,
+        bodyWidth: number, bodyHeight: number, bodyColor: number, cooldownColor: number, cooldownTimeMs: number
+    ) {
+        const playerGraphics = createPlayerGraphics(initialPosition, bodyWidth, bodyHeight, bodyColor);
+
+        this.playerCooldownGraphics = createPlayerGraphics(initialPosition, bodyWidth, bodyHeight, cooldownColor);
         this.playerCooldownGraphics.position.set(0, 0);
         this.playerCooldownGraphics.visible = false;
-        graphics.addChild(this.playerCooldownGraphics);
-        this.fireEngineGraphics = createFireEngineGraphics();
-        graphics.addChild(this.fireEngineGraphics);
+        playerGraphics.addChild(this.playerCooldownGraphics);
 
-        this.graphicalEntity = new GraphicalEntity(entityId, graphics);
-        this.movableEntity = new MovableEntity(graphics, direction, 0);
-        this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(graphics, direction);
+        this.fireEngineGraphics = createFireEngineGraphics(bodyWidth, bodyHeight, cooldownColor);
+        playerGraphics.addChild(this.fireEngineGraphics);
+
+        this.graphicalEntity = new GraphicalEntity(entityId, playerGraphics);
+        this.movableEntity = new MovableEntity(playerGraphics, direction, 0);
+        this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(playerGraphics, direction);
         this.initialDirection = { x: direction.x, y: direction.y };
-        this.acceleration = acceleration;
+        this.acceleration = 0;
         this.rotationSpeed = rotationSpeed;
-        this.cooldownTimer = new Timer();
+        this.cooldownTimer = new Timer(cooldownTimeMs);
     }
 
     addToStage(stage: Container<ContainerChild>) {
@@ -82,16 +86,16 @@ export default class Player {
     }
 
     startCooldown() {
-        this.cooldownTimer.restart(100);
+        this.cooldownTimer.restart();
     }
 
     isInCooldown() {
         return this.cooldownTimer.isRunning();
     }
 
-    advance(delta: number, screen: Rectangle) {
+    advance(time: Ticker, screen: Rectangle) {
         if (this.cooldownTimer.isRunning()) {
-            this.cooldownTimer.animate(delta);
+            this.cooldownTimer.animate(time);
             this.playerCooldownGraphics.visible = !this.playerCooldownGraphics.visible;
             this.graphicalEntity.getGraphics().visible = true;
         }
@@ -106,10 +110,10 @@ export default class Player {
             this.fireEngineGraphics.visible = false;
         }
         if (this.shouldRotate) {
-            this.rotate(delta, this.counterClockwiseRotation);
+            this.rotate(time.deltaTime, this.counterClockwiseRotation);
         }
 
-        let newSpeed = this.movableEntity.getSpeed() + this.acceleration * delta;
+        let newSpeed = this.movableEntity.getSpeed() + this.acceleration * time.deltaTime;
         if (newSpeed > 10.0) {
             newSpeed = 10.0;
         }
@@ -118,7 +122,7 @@ export default class Player {
         }
         this.movableEntity.setSpeed(newSpeed);
 
-        this.movableEntity.advance(delta);
+        this.movableEntity.advance(time.deltaTime);
         this.entityThatPassesThroughtWalls.advance(screen);
     }
 }

@@ -1,23 +1,25 @@
+import { Ticker } from "pixi.js";
+
 export default class Timer {
 
-    currentTime: number = 0;
-    endTime: number = 0;
+    currentTimeMs: number = 0;
+    endTimeMs: number = 0;
     stopped: boolean;
 
-    constructor() {
+    constructor(endTimeMs: number) {
         this.stopped = true;
+        this.endTimeMs = endTimeMs;
     }
 
-    restart(endTime: number) {
-        this.currentTime = 0;
-        this.endTime = endTime;
+    restart() {
+        this.currentTimeMs = 0;
         this.stopped = false;
     }
 
-    animate(deltaTime: number) {
+    animate(time: Ticker) {
         if (this.isRunning()) {
-            this.currentTime += deltaTime;
-            if (this.currentTime >= this.endTime) {
+            this.currentTimeMs += time.deltaMS;
+            if (this.currentTimeMs >= this.endTimeMs) {
                 this.stopped = true;
             }
         }

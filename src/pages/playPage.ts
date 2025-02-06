@@ -10,7 +10,7 @@ import CollisionDetector from "../collisionDetector";
 import { rotateVector } from "../helpers/vectorHelpers";
 import ScoreLabel from "../entities/scoreLabel";
 import LivesLabel from "../entities/livesLabel";
-
+import config from "../config";
 export default class PlayPage implements Page {
 
     private player: Player = null!;
@@ -28,8 +28,13 @@ export default class PlayPage implements Page {
             Entity.generateNextId(),
             { x: app.screen.width / 2, y: app.screen.height / 2 },
             { x: 0, y: -1 },
-            0,
-            0.1);
+            config.player.rotationSpeed,
+            config.player.bodyWidth,
+            config.player.bodyHeight,
+            config.player.bodyColor,
+            config.player.cooldownColor,
+            config.player.cooldownTimeMs);
+
         this.player.addToStage(app.stage);
         this.asteroids = [...Array(10).keys()].map(_ => this.createAsteroid(
             Math.random() > 0.5 ? AsteroidSize.BIG : AsteroidSize.MEDIUM,
@@ -60,7 +65,7 @@ export default class PlayPage implements Page {
         this.asteroids.forEach(asteriod => {
             asteriod.advance(time.deltaTime, this.app.screen);
         });
-        this.player.advance(time.deltaTime, this.app.screen);
+        this.player.advance(time, this.app.screen);
         this.bulletSpawner.animate(time);
         this.bullets.forEach(bullet => {
             bullet.advance(time.deltaTime, this.app.screen);
