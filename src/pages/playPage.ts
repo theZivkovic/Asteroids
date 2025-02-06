@@ -169,10 +169,14 @@ export default class PlayPage implements Page {
     }
 
     handlePlayerToAsteroidCollision(asteroidEntityId: number) {
+        if (this.player.isInCooldown()) {
+            return;
+        }
         const asteroid = this.asteroids.find(x => x.getEntityId() == asteroidEntityId);
         if (asteroid == null) { throw Error('Asteroid should be hit, but it does not exist') }
         this.livesLabel.updateLives(-1);
         this.removeAsteroid(asteroid);
+        this.player.startCooldown();
     }
 
     handleBulletToAsteroidCollision(bullet: Bullet, asteroidEntityId: number) {

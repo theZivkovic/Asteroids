@@ -3,6 +3,7 @@ import MovableEntity from "./movableEntity";
 import EntityThatPassedThroughWalls from "./entityThatPassedThroughWalls";
 import GraphicalEntity from "./graphicalEntity";
 import { createFireEngineGraphics, createPlayerGraphics } from "../playerGraphics";
+import Timer from "./timer";
 
 export default class Player {
     private acceleration: number;
@@ -10,11 +11,11 @@ export default class Player {
     private shouldRotate: boolean = false;
     private counterClockwiseRotation: boolean = false;
     private initialDirection: PointData;
-
     private graphicalEntity: GraphicalEntity;
     private movableEntity: MovableEntity;
     private entityThatPassesThroughtWalls: EntityThatPassedThroughWalls;
     private fireEngineGraphics: Graphics;
+    private cooldownTimer: Timer;
 
     constructor(entityId: number, initialPosition: PointData, direction: PointData, acceleration: number, rotationSpeed: number) {
         const graphics = createPlayerGraphics(initialPosition);
@@ -27,6 +28,7 @@ export default class Player {
         this.initialDirection = { x: direction.x, y: direction.y };
         this.acceleration = acceleration;
         this.rotationSpeed = rotationSpeed;
+        this.cooldownTimer = new Timer();
     }
 
     addToStage(stage: Container<ContainerChild>) {
@@ -74,7 +76,18 @@ export default class Player {
         this.graphicalEntity.getGraphics().rotation = newAngle - initialGraphicsRotation;
     }
 
+    startCooldown() {
+        this.cooldownTimer.restart(300);
+    }
+
+    isInCooldown() {
+        return this.cooldownTimer.isRunning();
+    }
+
     advance(delta: number, screen: Rectangle) {
+        if (this.cooldownTimer.isRunning()) {
+            this.cooldownTimer.animate(delta);
+        }
         if (this.acceleration > 0) {
             this.fireEngineGraphics.visible = !this.fireEngineGraphics.visible;
         }
