@@ -16,9 +16,14 @@ export default class Player {
     private entityThatPassesThroughtWalls: EntityThatPassedThroughWalls;
     private fireEngineGraphics: Graphics;
     private cooldownTimer: Timer;
+    private playerCooldownGraphics: Graphics;
 
     constructor(entityId: number, initialPosition: PointData, direction: PointData, acceleration: number, rotationSpeed: number) {
-        const graphics = createPlayerGraphics(initialPosition);
+        const graphics = createPlayerGraphics(initialPosition, 0xFFFFFF);
+        this.playerCooldownGraphics = createPlayerGraphics(initialPosition, 0xFF0000);
+        this.playerCooldownGraphics.position.set(0, 0);
+        this.playerCooldownGraphics.visible = false;
+        graphics.addChild(this.playerCooldownGraphics);
         this.fireEngineGraphics = createFireEngineGraphics();
         graphics.addChild(this.fireEngineGraphics);
 
@@ -87,6 +92,12 @@ export default class Player {
     advance(delta: number, screen: Rectangle) {
         if (this.cooldownTimer.isRunning()) {
             this.cooldownTimer.animate(delta);
+            this.playerCooldownGraphics.visible = !this.playerCooldownGraphics.visible;
+            this.graphicalEntity.getGraphics().visible = true;
+        }
+        else {
+            this.graphicalEntity.getGraphics().visible = true;
+            this.playerCooldownGraphics.visible = false;
         }
         if (this.acceleration > 0) {
             this.fireEngineGraphics.visible = !this.fireEngineGraphics.visible;

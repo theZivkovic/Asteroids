@@ -1,12 +1,12 @@
 import { GraphicsContext } from "pixi.js";
 
-const createTriangleContent = (width: number, height: number) => {
+const createTriangleContent = (width: number, height: number, color: number) => {
   return new GraphicsContext()
     .moveTo(-width / 2.0, height / 2.0)
     .lineTo(width / 2.0, height / 2.0)
     .lineTo(0, -height / 2.0)
     .lineTo(-width / 2.0, height / 2.0)
-    .stroke({ color: 0xFFFFFF, pixelLine: true });
+    .stroke({ color, pixelLine: true });
 }
 
 const createCircleContent = (radius: number) => {
