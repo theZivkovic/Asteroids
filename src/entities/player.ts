@@ -1,8 +1,8 @@
-import { Container, ContainerChild, PointData, Rectangle } from "pixi.js";
+import { Container, ContainerChild, Graphics, PointData, Rectangle } from "pixi.js";
 import MovableEntity from "./movableEntity";
 import EntityThatPassedThroughWalls from "./entityThatPassedThroughWalls";
 import GraphicalEntity from "./graphicalEntity";
-import { createPlayerGraphics } from "../playerGraphics";
+import { createFireEngineGraphics, createPlayerGraphics } from "../playerGraphics";
 
 export default class Player {
     private acceleration: number;
@@ -14,9 +14,13 @@ export default class Player {
     private graphicalEntity: GraphicalEntity;
     private movableEntity: MovableEntity;
     private entityThatPassesThroughtWalls: EntityThatPassedThroughWalls;
+    private fireEngineGraphics: Graphics;
 
     constructor(entityId: number, initialPosition: PointData, direction: PointData, acceleration: number, rotationSpeed: number) {
         const graphics = createPlayerGraphics(initialPosition);
+        this.fireEngineGraphics = createFireEngineGraphics();
+        graphics.addChild(this.fireEngineGraphics);
+
         this.graphicalEntity = new GraphicalEntity(entityId, graphics);
         this.movableEntity = new MovableEntity(graphics, direction, 0);
         this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(graphics, direction);
@@ -71,6 +75,12 @@ export default class Player {
     }
 
     advance(delta: number, screen: Rectangle) {
+        if (this.acceleration > 0) {
+            this.fireEngineGraphics.visible = !this.fireEngineGraphics.visible;
+        }
+        if (this.acceleration <= 0) {
+            this.fireEngineGraphics.visible = false;
+        }
         if (this.shouldRotate) {
             this.rotate(delta, this.counterClockwiseRotation);
         }

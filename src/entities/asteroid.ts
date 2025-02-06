@@ -2,7 +2,7 @@ import { Container, ContainerChild, Graphics, PointData, Rectangle } from "pixi.
 import MovableEntity from "./movableEntity";
 import EntityThatPassedThroughWalls from "./entityThatPassedThroughWalls";
 import GraphicalEntity from "./graphicalEntity";
-import { createAsteroidContent } from "../graphicsContentsFactory";
+import { createCircleContent } from "../graphicsContentsFactory";
 
 enum AsteroidSize {
     BIG,
@@ -41,7 +41,7 @@ class Asteroid {
     }
 
     createGraphicsBySize(asteroidSize: AsteroidSize) {
-        const content = createAsteroidContent(30);
+        const content = createCircleContent(30);
         const graphics = new Graphics(content);
         switch (asteroidSize) {
             case AsteroidSize.BIG: return graphics;
