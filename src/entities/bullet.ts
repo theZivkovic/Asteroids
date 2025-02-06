@@ -1,4 +1,4 @@
-import { Graphics, PointData, Rectangle } from "pixi.js";
+import { Container, ContainerChild, Graphics, PointData, Rectangle } from "pixi.js";
 import MovableEntity from "./movableEntity";
 import eventEmitter from "../eventEmitter";
 import Events from "../events";
@@ -13,9 +13,13 @@ export default class Bullet {
         this.movableEntity = new MovableEntity(graphics, { x: direction.x, y: direction.y }, speed);
     }
 
-    getGraphics() {
-        return this.graphicalEntity.getGraphics();
-    };
+    addToStage(stage: Container<ContainerChild>) {
+        stage.addChild(this.graphicalEntity.getGraphics());
+    }
+
+    destroy() {
+        this.getGraphicalEntity().getGraphics().destroy();
+    }
 
     getGraphicalEntity() {
         return this.graphicalEntity;
@@ -23,7 +27,7 @@ export default class Bullet {
 
     advance(delta: number, screen: Rectangle,) {
         this.movableEntity.advance(delta);
-        const position = this.getGraphics().position;
+        const position = this.getGraphicalEntity().getGraphics().position;
         if (position.x >= screen.width || position.x < 0 ||
             position.y >= screen.height || position.y < 0) {
             eventEmitter.emit(Events.BULLET_REACHED_A_WALL, { bulletEntityId: this.graphicalEntity.getId() });

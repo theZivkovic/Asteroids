@@ -11,10 +11,6 @@ export default class MovableEntity {
         this.speed = speed;
     }
 
-    getGraphics() {
-        return this.graphics
-    };
-
     getDirection() {
         return this.direction;
     }

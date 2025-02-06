@@ -1,7 +1,8 @@
-import { Graphics, PointData, Rectangle } from "pixi.js";
+import { Container, ContainerChild, PointData, Rectangle } from "pixi.js";
 import MovableEntity from "./movableEntity";
 import EntityThatPassedThroughWalls from "./entityThatPassedThroughWalls";
 import GraphicalEntity from "./graphicalEntity";
+import { createPlayerGraphics } from "../playerGraphics";
 
 export default class Player {
     private acceleration: number;
@@ -14,7 +15,8 @@ export default class Player {
     private movableEntity: MovableEntity;
     private entityThatPassesThroughtWalls: EntityThatPassedThroughWalls;
 
-    constructor(entityId: number, graphics: Graphics, direction: PointData, acceleration: number, rotationSpeed: number) {
+    constructor(entityId: number, initialPosition: PointData, direction: PointData, acceleration: number, rotationSpeed: number) {
+        const graphics = createPlayerGraphics(initialPosition);
         this.graphicalEntity = new GraphicalEntity(entityId, graphics);
         this.movableEntity = new MovableEntity(graphics, direction, 0);
         this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(graphics, direction);
@@ -23,9 +25,13 @@ export default class Player {
         this.rotationSpeed = rotationSpeed;
     }
 
-    getGraphics() {
-        return this.graphicalEntity.getGraphics();
-    };
+    addToStage(stage: Container<ContainerChild>) {
+        stage.addChild(this.graphicalEntity.getGraphics());
+    }
+
+    destroy() {
+        this.graphicalEntity.getGraphics().destroy();
+    }
 
     getGraphicalEntity() {
         return this.graphicalEntity;
@@ -61,7 +67,7 @@ export default class Player {
             y: Math.sin(newAngle)
         });
         const initialGraphicsRotation = Math.atan2(this.initialDirection.y, this.initialDirection.x)
-        this.movableEntity.getGraphics().rotation = newAngle - initialGraphicsRotation;
+        this.graphicalEntity.getGraphics().rotation = newAngle - initialGraphicsRotation;
     }
 
     advance(delta: number, screen: Rectangle) {

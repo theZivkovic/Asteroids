@@ -1,6 +1,5 @@
 import { Application, Graphics, PointData, Renderer, Ticker } from "pixi.js";
 import { Page, PageId } from "./page";
-import { createPlayerGraphics } from "../playerGraphics";
 import { createBulletContent } from "../graphicsContentsFactory";
 import { Asteroid, AsteroidSize } from "../entities/asteroid";
 import Player from "../entities/player";
@@ -25,14 +24,13 @@ export default class PlayPage implements Page {
 
     initialize(app: Application<Renderer>): void {
         this.app = app;
-        const playerGraphics = createPlayerGraphics({ x: app.screen.width / 2, y: app.screen.height / 2 });
         this.player = new Player(
             Entity.generateNextId(),
-            playerGraphics,
+            { x: app.screen.width / 2, y: app.screen.height / 2 },
             { x: 0, y: -1 },
             0,
             0.1);
-        app.stage.addChild(this.player.getGraphics());
+        this.player.addToStage(app.stage);
         this.asteroids = [...Array(10).keys()].map(_ => this.createAsteroid(
             Math.random() > 0.5 ? AsteroidSize.BIG : AsteroidSize.MEDIUM,
             { x: Math.random(), y: Math.random() },
@@ -51,8 +49,8 @@ export default class PlayPage implements Page {
     }
 
     cleanUp(): void {
-        this.player.getGraphics().destroy();
-        this.asteroids.forEach(x => x.getGraphics().destroy());
+        this.player.destroy();
+        this.asteroids.forEach(x => x.destroy());
     }
 
     animate(time: Ticker): void {
@@ -96,9 +94,9 @@ export default class PlayPage implements Page {
 
     addABullet() {
         const bulletGraphics = new Graphics(createBulletContent(2));
-        bulletGraphics.position = this.player.getGraphics().position;
+        bulletGraphics.position = this.player.getGraphicalEntity().getGraphics().position;
         const bullet = new Bullet(Entity.generateNextId(), bulletGraphics, this.player.getDirection(), 5);
-        this.app.stage.addChild(bullet.getGraphics());
+        bullet.addToStage(this.app.stage);
         this.bullets.push(bullet);
         this.asteroids.forEach(asteroid => {
             this.collisionDetector.track(bullet.getGraphicalEntity(), asteroid.getGraphicalEntity());
@@ -112,12 +110,11 @@ export default class PlayPage implements Page {
             direction,
             speed
         );
-        asteroid.getGraphics().position.set(
-            position.x,
-            position.y
-        );
-
-        this.app.stage.addChild(asteroid.getGraphics());
+        asteroid.setPosition({
+            x: position.x,
+            y: position.y
+        });
+        asteroid.addToStage(this.app.stage);
         this.collisionDetector.track(
             this.player.getGraphicalEntity(),
             asteroid.getGraphicalEntity());
@@ -129,7 +126,7 @@ export default class PlayPage implements Page {
         if (bulletIndex < 0) { throw new Error(`can't find a bullet to remove, index: ${bulletIndex}, entityId: ${bulletToRemove.getEntityId()}`) }
         this.bullets.splice(bulletIndex, 1);
         this.collisionDetector.untrackLeft(bulletToRemove.getGraphicalEntity());
-        bulletToRemove.getGraphics().destroy();
+        bulletToRemove.destroy();
     }
 
     removeBulletById(entityId: number) {
@@ -139,11 +136,11 @@ export default class PlayPage implements Page {
     }
 
     removeAsteroid(asteroid: Asteroid) {
-        const asteroidPosition = asteroid.getGraphics().position;
+        const asteroidPosition = asteroid.getPosition();
         this.collisionDetector.untrackRight(asteroid.getGraphicalEntity());
         const asteroidToRemoveIndex = this.asteroids.indexOf(asteroid);
         this.asteroids.splice(asteroidToRemoveIndex, 1);
-        asteroid.getGraphics().destroy();
+        asteroid.destroy();
 
         if (asteroid.getAsteroidSize() != AsteroidSize.SMALL) {
             this.asteroids.push(this.createAsteroid(

@@ -1,4 +1,4 @@
-import { Graphics, PointData, Rectangle } from "pixi.js";
+import { Container, ContainerChild, Graphics, PointData, Rectangle } from "pixi.js";
 import MovableEntity from "./movableEntity";
 import EntityThatPassedThroughWalls from "./entityThatPassedThroughWalls";
 import GraphicalEntity from "./graphicalEntity";
@@ -24,6 +24,22 @@ class Asteroid {
         this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(graphics, direction);
     }
 
+    addToStage(stage: Container<ContainerChild>) {
+        stage.addChild(this.getGraphicalEntity().getGraphics());
+    }
+
+    destroy() {
+        this.getGraphicalEntity().getGraphics().destroy();
+    }
+
+    setPosition(newPosition: PointData) {
+        this.graphicalEntity.getGraphics().position.set(newPosition.x, newPosition.y);
+    }
+
+    getPosition() {
+        return this.graphicalEntity.getGraphics().position;
+    }
+
     createGraphicsBySize(asteroidSize: AsteroidSize) {
         const content = createAsteroidContent(30);
         const graphics = new Graphics(content);
@@ -42,10 +58,6 @@ class Asteroid {
             default: return graphics;
         }
     }
-
-    getGraphics() {
-        return this.movableEntity.getGraphics();
-    };
 
     getAsteroidSize() {
         return this.asteroidSize;
