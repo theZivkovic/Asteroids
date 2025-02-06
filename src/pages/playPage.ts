@@ -50,8 +50,8 @@ export default class PlayPage implements Page {
 
     cleanUp(): void {
         this.player.destroy();
-        this.bullets.forEach(bullet => this.removeBullet(bullet));
-        this.asteroids.forEach(asteroid => this.removeAsteroid(asteroid));
+        while (this.bullets.length > 0) this.removeBullet(this.bullets[0]);
+        while (this.asteroids.length > 0) this.removeAsteroid(this.asteroids[0]);
         this.livesLabel.getGraphics().destroy();
         this.scoreLabel.getGraphics().destroy();
     }
