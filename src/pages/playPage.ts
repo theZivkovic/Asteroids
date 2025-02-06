@@ -117,6 +117,7 @@ export default class PlayPage implements Page {
             x: position.x,
             y: position.y
         });
+        this.asteroids.push(asteroid);
         asteroid.addToStage(this.app.stage);
         this.collisionDetector.track(
             this.player.getGraphicalEntity(),
@@ -146,7 +147,14 @@ export default class PlayPage implements Page {
     }
 
     breakDownAsteroid(asteroid: Asteroid) {
-        const asteroidPosition = asteroid.getPosition();
+        if (asteroid.getGraphicalEntity().getGraphics().destroyed) {
+            return;
+        }
+
+        const asteroidPosition = {
+            x: asteroid.getPosition().x,
+            y: asteroid.getPosition().y
+        };
         this.removeAsteroid(asteroid);
 
         if (asteroid.getAsteroidSize() != AsteroidSize.SMALL) {

@@ -29,6 +29,7 @@ export default class MovableEntity {
     }
 
     advance(delta: number) {
+        if (this.graphics.destroyed) { return; }
         const newPosition: PointData = {
             x: this.graphics.position.x + this.direction.x * this.speed * delta,
             y: this.graphics.position.y + this.direction.y * this.speed * delta

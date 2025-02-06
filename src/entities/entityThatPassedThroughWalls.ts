@@ -38,6 +38,7 @@ export default class EntityThatPassedThroughWalls {
     }
 
     advance(screen: Rectangle) {
+        if (this.graphics.destroyed) { return; }
         const newPosition = this.graphics.position;
 
         if (newPosition.x > screen.width) {
