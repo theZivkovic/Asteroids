@@ -6,7 +6,7 @@ import { createFireEngineGraphics, createPlayerGraphics } from "../playerGraphic
 import Timer from "./timer";
 
 export default class Player {
-    private acceleration: number;
+    private currentAcceleration: number;
     private rotationSpeed: number;
     private shouldRotate: boolean = false;
     private counterClockwiseRotation: boolean = false;
@@ -17,9 +17,12 @@ export default class Player {
     private fireEngineGraphics: Graphics;
     private cooldownTimer: Timer;
     private playerCooldownGraphics: Graphics;
+    private acceleration: number;
+    private maxSpeed: number;
 
     constructor(entityId: number, initialPosition: PointData, direction: PointData, rotationSpeed: number,
-        bodyWidth: number, bodyHeight: number, bodyColor: number, fireColor: number, cooldownColor: number, cooldownTimeMs: number
+        bodyWidth: number, bodyHeight: number, bodyColor: number, fireColor: number, cooldownColor: number,
+        cooldownTimeMs: number, acceleration: number, maxSpeed: number
     ) {
         const playerGraphics = createPlayerGraphics(initialPosition, bodyWidth, bodyHeight, bodyColor);
 
@@ -35,9 +38,11 @@ export default class Player {
         this.movableEntity = new MovableEntity(playerGraphics, direction, 0);
         this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(playerGraphics, direction);
         this.initialDirection = { x: direction.x, y: direction.y };
-        this.acceleration = 0;
+        this.currentAcceleration = 0;
         this.rotationSpeed = rotationSpeed;
         this.cooldownTimer = new Timer(cooldownTimeMs);
+        this.acceleration = acceleration;
+        this.maxSpeed = maxSpeed;
     }
 
     addToStage(stage: Container<ContainerChild>) {
@@ -57,11 +62,11 @@ export default class Player {
     }
 
     accelerate() {
-        this.acceleration = 0.5;
+        this.currentAcceleration = this.acceleration;
     }
 
     slowDown() {
-        this.acceleration = -0.5;
+        this.currentAcceleration = -this.acceleration;
     }
 
     startRotate(counterClockwiseRotation: boolean) {
@@ -103,19 +108,19 @@ export default class Player {
             this.graphicalEntity.getGraphics().visible = true;
             this.playerCooldownGraphics.visible = false;
         }
-        if (this.acceleration > 0) {
+        if (this.currentAcceleration > 0) {
             this.fireEngineGraphics.visible = !this.fireEngineGraphics.visible;
         }
-        if (this.acceleration <= 0) {
+        if (this.currentAcceleration <= 0) {
             this.fireEngineGraphics.visible = false;
         }
         if (this.shouldRotate) {
             this.rotate(time, this.counterClockwiseRotation);
         }
 
-        let newSpeed = this.movableEntity.getSpeed() + this.acceleration * time.deltaTime;
-        if (newSpeed > 10.0) {
-            newSpeed = 10.0;
+        let newSpeed = this.movableEntity.getSpeed() + this.currentAcceleration * time.deltaTime;
+        if (newSpeed > this.maxSpeed) {
+            newSpeed = this.maxSpeed;
         }
         else if (newSpeed < 0.0) {
             newSpeed = 0;

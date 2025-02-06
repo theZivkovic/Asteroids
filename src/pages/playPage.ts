@@ -34,7 +34,9 @@ export default class PlayPage implements Page {
             config.player.bodyColor,
             config.player.fireColor,
             config.player.cooldownColor,
-            config.player.cooldownTimeMs);
+            config.player.cooldownTimeMs,
+            config.player.acceleration,
+            config.player.maxSpeed);
 
         this.player.addToStage(app.stage);
         this.asteroids = [...Array(10).keys()].map(_ => this.createAsteroid(
