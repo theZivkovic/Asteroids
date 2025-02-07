@@ -11,29 +11,35 @@ type AsteroidSpeedsConfig = {
 }
 
 const config = {
+    initialLives: 3,
     player: {
         rotationSpeed: 0.1,
-        bodyWidth: 10,
-        bodyHeight: 18,
+        bodyWidth: 20,
+        bodyHeight: 40,
         bodyColor: 0xFFFFFF,
         cooldownColor: 0xFF0000,
         fireColor: 0xFFFF00,
-        cooldownTimeMs: 2000,
+        cooldownTimeMs: 5000,
         acceleration: 0.15,
         maxSpeed: 6
     },
     asteroids: {
-        initialCount: 15,
+        initialCount: 5,
         baseAsteroidWidth: 50,
         scales: {
-            big: 1,
+            big: 1.5,
             medium: 0.7,
-            small: 0.4
+            small: 0.2
         },
         speeds: {
             big: 0.7,
             medium: 1.0,
             small: 1.2
+        },
+        points: {
+            big: 10,
+            medium: 20,
+            small: 30
         }
     }
 }

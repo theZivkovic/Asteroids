@@ -11,6 +11,7 @@ import { rotateVector } from "../helpers/vectorHelpers";
 import ScoreLabel from "../entities/scoreLabel";
 import LivesLabel from "../entities/livesLabel";
 import { config } from "../config";
+
 export default class PlayPage implements Page {
 
     private player: Player = null!;
@@ -20,10 +21,11 @@ export default class PlayPage implements Page {
     private bullets: Array<Bullet> = [];
     private collisionDetector = new CollisionDetector();
     private scoreLabel = new ScoreLabel();
-    private livesLabel = new LivesLabel();
+    private livesLabel: LivesLabel = null!;
 
     initialize(app: Application<Renderer>): void {
         this.app = app;
+
         this.player = new Player(
             Entity.generateNextId(),
             { x: app.screen.width / 2, y: app.screen.height / 2 },
@@ -37,8 +39,8 @@ export default class PlayPage implements Page {
             config.player.cooldownTimeMs,
             config.player.acceleration,
             config.player.maxSpeed);
-
         this.player.addToStage(app.stage);
+
         this.asteroids = [...Array(config.asteroids.initialCount).keys()]
             .map(_ => this.createAsteroid(
                 Math.random() > 0.5 ? AsteroidSize.BIG : AsteroidSize.MEDIUM,
@@ -46,12 +48,13 @@ export default class PlayPage implements Page {
                 { x: Math.random() * app.screen.width, y: Math.random() * app.screen.height },
                 0.7 + Math.random() * 0.5
             ));
+
         this.bulletSpawner = new BulletSpawner(this.player, 10);
         this.bullets = [];
         this.scoreLabel = new ScoreLabel();
         this.scoreLabel.getGraphics().position.set(5, 10);
         app.stage.addChild(this.scoreLabel.getGraphics());
-        this.livesLabel = new LivesLabel();
+        this.livesLabel = new LivesLabel(config.initialLives);
         this.livesLabel.getGraphics().position.set(120, 10);
         app.stage.addChild(this.livesLabel.getGraphics());
 
@@ -125,15 +128,19 @@ export default class PlayPage implements Page {
             config.asteroids.scales,
             config.asteroids.speeds
         );
+
         asteroid.setPosition({
             x: position.x,
             y: position.y
         });
+
         this.asteroids.push(asteroid);
         asteroid.addToStage(this.app.stage);
+
         this.collisionDetector.track(
             this.player.getGraphicalEntity(),
             asteroid.getGraphicalEntity());
+
         return asteroid;
     }
 
@@ -199,8 +206,12 @@ export default class PlayPage implements Page {
         if (this.player.isInCooldown()) {
             return;
         }
+
         const asteroid = this.asteroids.find(x => x.getEntityId() == asteroidEntityId);
-        if (asteroid == null) { throw Error('Asteroid should be hit, but it does not exist') }
+        if (asteroid == null) {
+            throw Error('Asteroid should be hit, but it does not exist')
+        }
+
         this.livesLabel.updateLives(-1);
         this.breakDownAsteroid(asteroid);
         this.player.startCooldown();
@@ -208,7 +219,9 @@ export default class PlayPage implements Page {
 
     handleBulletToAsteroidCollision(bullet: Bullet, asteroidEntityId: number) {
         const asteroid = this.asteroids.find(x => x.getEntityId() == asteroidEntityId);
-        if (asteroid == null) { throw Error('Asteroid should be hit, but it does not exist') }
+        if (asteroid == null) {
+            throw Error('Asteroid should be hit, but it does not exist')
+        }
         this.scoreLabel.updateScore(this.asteroidToPoints(asteroid.getAsteroidSize()));
         this.breakDownAsteroid(asteroid);
         this.removeBullet(bullet);
@@ -216,9 +229,9 @@ export default class PlayPage implements Page {
 
     asteroidToPoints(asteriodSize: AsteroidSize) {
         switch (asteriodSize) {
-            case AsteroidSize.BIG: return 10;
-            case AsteroidSize.MEDIUM: return 15;
-            case AsteroidSize.SMALL: return 20;
+            case AsteroidSize.BIG: return config.asteroids.points.big;
+            case AsteroidSize.MEDIUM: return config.asteroids.points.medium;
+            case AsteroidSize.SMALL: return config.asteroids.points.small;
         }
     }
 }

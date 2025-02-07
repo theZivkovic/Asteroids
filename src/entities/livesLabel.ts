@@ -5,9 +5,10 @@ import Events from "../events";
 export default class LivesLabel {
 
     label: BitmapText = null!;
-    lives: number = 5;
+    lives: number;
 
-    constructor() {
+    constructor(initialLives: number) {
+        this.lives = initialLives;
         this.label = new BitmapText({
             text: this.generateLivesText(),
             style: {
