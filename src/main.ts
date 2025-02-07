@@ -1,9 +1,10 @@
 import { Application, Assets, Sprite } from "pixi.js";
 import WelcomePage from "./pages/welcomePage";
 import GameManager from "./gameManager";
+import { AssetId, assetLoader } from "./assetLoader";
 
 (async () => {
-  // Create a new application
+  await assetLoader.loadAll();
   const app = new Application();
 
   // Initialize the application
@@ -16,6 +17,13 @@ import GameManager from "./gameManager";
 
   // Append the application canvas to the document body
   document.getElementById("pixi-container")!.appendChild(app.canvas);
+
+  // const sprite = new Sprite(assetLoader.getTexture(AssetId.BIG_VUCIC));
+  // sprite.width = 50;
+  // sprite.height = 50;
+  // sprite.x = 20;
+  // sprite.y = 20;
+  // app.stage.addChild(sprite);
 
   // Load the bunny texture
   const texture = await Assets.load("/assets/bunny.png");

@@ -52,21 +52,26 @@ class Asteroid {
     }
 
     createGraphicsBySize(bigAsteroidWidth: number, asteroidSize: AsteroidSize, scales: AsteroidScalesConfig) {
-        const content = createCircleContent(bigAsteroidWidth);
-        const graphics = new Graphics(content);
+
         switch (asteroidSize) {
-            case AsteroidSize.BIG: return graphics;
+            case AsteroidSize.BIG:
+                const content = createCircleContent(bigAsteroidWidth);
+                const graphics = new Graphics(content); return graphics;
             case AsteroidSize.MEDIUM: {
+                const content = createCircleContent(bigAsteroidWidth);
+                const graphics = new Graphics(content);
                 graphics.scale.x *= scales.medium;
                 graphics.scale.y *= scales.medium;
                 return graphics;
             }
             case AsteroidSize.SMALL: {
+                const content = createCircleContent(bigAsteroidWidth);
+                const graphics = new Graphics(content);
                 graphics.scale.x *= scales.small;
                 graphics.scale.y *= scales.small;
                 return graphics;
             }
-            default: return graphics;
+            default: throw new Error(`asteroid size: ${asteroidSize} not supported for creation`);
         }
     }
 
