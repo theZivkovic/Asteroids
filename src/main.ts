@@ -1,7 +1,7 @@
 import { Application, Assets, Sprite } from "pixi.js";
 import WelcomePage from "./pages/welcomePage";
 import GameManager from "./gameManager";
-import { AssetId, assetLoader } from "./assetLoader";
+import { assetLoader } from "./assetLoader";
 
 (async () => {
   await assetLoader.loadAll();
