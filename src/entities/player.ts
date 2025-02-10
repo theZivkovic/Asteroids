@@ -39,7 +39,7 @@ export default class Player implements Collidable {
 
         this.entity = new Entity(entityId);
         this.movableEntity = new MovableEntity(playerGraphics.position, direction, 0);
-        this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(playerGraphics, direction);
+        this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(playerGraphics.position, direction);
         this.initialDirection = { x: direction.x, y: direction.y };
         this.currentAcceleration = 0;
         this.rotationSpeed = rotationSpeed;

@@ -25,7 +25,7 @@ const config = {
     },
     asteroids: {
         initialCount: 5,
-        baseAsteroidWidth: 50,
+        baseAsteroidWidth: 150,
         scales: {
             big: 1.5,
             medium: 0.7,

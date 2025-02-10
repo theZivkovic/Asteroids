@@ -1,4 +1,4 @@
-import { Graphics, PointData, Rectangle } from "pixi.js";
+import { ObservablePoint, PointData, Rectangle } from "pixi.js";
 
 enum ScreenSide {
     TOP,
@@ -8,11 +8,11 @@ enum ScreenSide {
 };
 
 export default class EntityThatPassedThroughWalls {
-    private graphics: Graphics;
+    private position: ObservablePoint;
     private direction: PointData = null!;
 
-    constructor(graphics: Graphics, direction: PointData) {
-        this.graphics = graphics;
+    constructor(position: ObservablePoint, direction: PointData) {
+        this.position = position;
         this.direction = direction;
     }
 
@@ -38,8 +38,8 @@ export default class EntityThatPassedThroughWalls {
     }
 
     advance(screen: Rectangle) {
-        if (this.graphics.destroyed) { return; }
-        const newPosition = this.graphics.position;
+        // if (this.graphics.destroyed) { return; }
+        const newPosition = { x: this.position.x, y: this.position.y };
 
         if (newPosition.x > screen.width) {
             const newEntryPoint = this.calculateNewEntryPoint(new Set([
@@ -82,6 +82,6 @@ export default class EntityThatPassedThroughWalls {
             newPosition.y = newEntryPoint.y;
         }
 
-        this.graphics.position.set(newPosition.x, newPosition.y);
+        this.position.set(newPosition.x, newPosition.y);
     }
 }

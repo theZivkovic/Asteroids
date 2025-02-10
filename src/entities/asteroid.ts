@@ -1,10 +1,10 @@
-import { Bounds, Container, ContainerChild, Graphics, PointData, Rectangle, Ticker } from "pixi.js";
+import { Bounds, Container, ContainerChild, PointData, Rectangle, Sprite, Ticker, ViewContainer } from "pixi.js";
 import MovableEntity from "./movableEntity";
 import EntityThatPassedThroughWalls from "./entityThatPassedThroughWalls";
-import { createCircleContent } from "../graphicsContentsFactory";
 import { AsteroidScalesConfig, AsteroidSpeedsConfig } from "../config";
 import Entity from "./entity";
 import { Collidable } from "./collidable";
+import { AssetId, assetLoader } from "../assetLoader";
 
 enum AsteroidSize {
     BIG,
@@ -17,7 +17,7 @@ class Asteroid implements Collidable {
     private movableEntity: MovableEntity;
     private entityThatPassesThroughtWalls: EntityThatPassedThroughWalls;
     private asteroidSize: AsteroidSize;
-    private graphics: Graphics;
+    private graphics: ViewContainer;
 
     constructor(entityId: number, baseAsteroidWidth: number, asteroidSize: AsteroidSize, direction: PointData, baseAsteroidSpeed: number, scales: AsteroidScalesConfig, speeds: AsteroidSpeedsConfig) {
         this.asteroidSize = asteroidSize;
@@ -25,7 +25,7 @@ class Asteroid implements Collidable {
         this.graphics = this.createGraphicsBySize(baseAsteroidWidth, asteroidSize, scales);
         this.entity = new Entity(entityId);
         this.movableEntity = new MovableEntity(this.graphics.position, direction, speed);
-        this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(this.graphics, direction);
+        this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(this.graphics.position, direction);
     }
 
     getBounds(): Bounds | undefined {
@@ -59,23 +59,21 @@ class Asteroid implements Collidable {
 
     createGraphicsBySize(bigAsteroidWidth: number, asteroidSize: AsteroidSize, scales: AsteroidScalesConfig) {
 
+        const sprite = new Sprite(assetLoader.getTexture(AssetId.BIG_VUCIC));
+        sprite.width = bigAsteroidWidth;
+        sprite.height = bigAsteroidWidth;
+
         switch (asteroidSize) {
-            case AsteroidSize.BIG:
-                const content = createCircleContent(bigAsteroidWidth);
-                const graphics = new Graphics(content); return graphics;
+            case AsteroidSize.BIG: return sprite;
             case AsteroidSize.MEDIUM: {
-                const content = createCircleContent(bigAsteroidWidth);
-                const graphics = new Graphics(content);
-                graphics.scale.x *= scales.medium;
-                graphics.scale.y *= scales.medium;
-                return graphics;
+                sprite.scale.x *= scales.medium;
+                sprite.scale.y *= scales.medium;
+                return sprite;
             }
             case AsteroidSize.SMALL: {
-                const content = createCircleContent(bigAsteroidWidth);
-                const graphics = new Graphics(content);
-                graphics.scale.x *= scales.small;
-                graphics.scale.y *= scales.small;
-                return graphics;
+                sprite.scale.x *= scales.small;
+                sprite.scale.y *= scales.small;
+                return sprite;
             }
             default: throw new Error(`asteroid size: ${asteroidSize} not supported for creation`);
         }
@@ -93,6 +91,7 @@ class Asteroid implements Collidable {
     advance(time: Ticker, screen: Rectangle) {
         this.movableEntity.advance(time);
         this.entityThatPassesThroughtWalls.advance(screen);
+        this.graphics.rotation += time.deltaTime * 0.01 * Math.random();
     }
 
     getEntityId() {
