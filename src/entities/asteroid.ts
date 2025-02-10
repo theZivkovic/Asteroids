@@ -64,14 +64,14 @@ class Asteroid implements Collidable {
         switch (asteroidSize) {
 
             case AsteroidSize.BIG: {
-                const sprite = new Sprite(assetLoader.getTexture(AssetId.BIG_VUCIC));
+                const sprite = new Sprite(assetLoader.getTexture(AssetId.ASTEROID));
                 sprite.width = bigAsteroidWidth;
                 sprite.height = bigAsteroidWidth;
                 sprite.anchor = 0.5;
                 return sprite;
             }
             case AsteroidSize.MEDIUM: {
-                const sprite = new Sprite(assetLoader.getTexture(AssetId.MEDIUM_BRNABIC));
+                const sprite = new Sprite(assetLoader.getTexture(AssetId.ASTEROID));
                 sprite.width = bigAsteroidWidth;
                 sprite.height = bigAsteroidWidth;
                 sprite.scale.x *= scales.medium;
@@ -80,7 +80,7 @@ class Asteroid implements Collidable {
                 return sprite;
             }
             case AsteroidSize.SMALL: {
-                const sprite = new Sprite(assetLoader.getTexture(AssetId.SMALL_SAPIC));
+                const sprite = new Sprite(assetLoader.getTexture(AssetId.ASTEROID));
                 sprite.width = bigAsteroidWidth;
                 sprite.height = bigAsteroidWidth;
                 sprite.scale.x *= scales.small;
