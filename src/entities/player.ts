@@ -66,10 +66,6 @@ export default class Player implements Collidable {
         return this.movableEntity.getDirection();
     }
 
-    getMovableEntity() {
-        return this.movableEntity;
-    }
-
     accelerate() {
         this.currentAcceleration = this.acceleration;
     }
@@ -109,7 +105,7 @@ export default class Player implements Collidable {
 
     advance(time: Ticker, screen: Rectangle) {
         if (this.cooldownTimer.isRunning()) {
-            this.cooldownTimer.animate(time);
+            this.cooldownTimer.advance(time);
             this.playerCooldownGraphics.visible = !this.playerCooldownGraphics.visible;
             this.graphics.visible = true;
         }
@@ -142,10 +138,6 @@ export default class Player implements Collidable {
 
     getEntityId() {
         return this.entity.getId();
-    }
-
-    getGraphics() {
-        return this.graphics;
     }
 
     setPosition(newPosition: PointData) {

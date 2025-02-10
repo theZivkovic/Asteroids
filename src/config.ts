@@ -24,17 +24,18 @@ const config = {
         maxSpeed: 6
     },
     asteroids: {
+        baseSpeed: 0.7,
         initialCount: 15,
         baseAsteroidWidth: 150,
         scales: {
             big: 1.5,
-            medium: 0.7,
-            small: 0.4
+            medium: 0.9,
+            small: 0.6
         },
         speeds: {
-            big: 0.7,
-            medium: 1.0,
-            small: 1.4
+            big: 1.0,
+            medium: 1.2,
+            small: 1.8
         },
         points: {
             big: 10,

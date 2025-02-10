@@ -10,6 +10,11 @@ import { rotateVector } from "../helpers/vectorHelpers";
 import ScoreLabel from "../entities/scoreLabel";
 import LivesLabel from "../entities/livesLabel";
 import { config } from "../config";
+import { SoundId, soundLoader } from "../soundLoader";
+import { AsteroidImageHierarchy } from "../asteroidImageHierarchy";
+import defaultAsteroidHierarchy from '../data/defaultAsteroidHierarchy.json';
+import AsteroidFactory from "../factories/asteroidFactory";
+import { TextureId } from "../textureLoader";
 
 export default class PlayPage implements Page {
 
@@ -21,10 +26,11 @@ export default class PlayPage implements Page {
     private collisionDetector = new CollisionDetector();
     private scoreLabel = new ScoreLabel();
     private livesLabel: LivesLabel = null!;
+    private hierarchy: AsteroidImageHierarchy = null!;
 
     initialize(app: Application<Renderer>): void {
         this.app = app;
-
+        this.fillImageHierarchy();
         this.player = new Player(
             Entity.generateNextId(),
             { x: app.screen.width / 2, y: app.screen.height / 2 },
@@ -41,12 +47,16 @@ export default class PlayPage implements Page {
         this.player.addToStage(app.stage);
 
         this.asteroids = [...Array(config.asteroids.initialCount).keys()]
-            .map(_ => this.createAsteroid(
-                Math.random() > 0.5 ? AsteroidSize.BIG : AsteroidSize.MEDIUM,
-                { x: Math.random(), y: Math.random() },
-                { x: Math.random() * app.screen.width, y: Math.random() * app.screen.height },
-                0.7 + Math.random() * 0.5
-            ));
+            .map(_ => {
+                const asteroidSize = Math.random() > 0.5 ? AsteroidSize.BIG : AsteroidSize.MEDIUM
+                const textureId = this.hierarchy.getRandomTextureOnLevel(asteroidSize);
+                return this.createAsteroid(
+                    asteroidSize,
+                    textureId!,
+                    { x: Math.random(), y: Math.random() },
+                    { x: Math.random() * app.screen.width, y: Math.random() * app.screen.height }
+                )
+            });
 
         this.bulletSpawner = new BulletSpawner(this.player, config.bullet.spawnInterval);
         this.bullets = [];
@@ -56,7 +66,11 @@ export default class PlayPage implements Page {
         this.livesLabel = new LivesLabel(config.initialLives);
         this.livesLabel.getGraphics().position.set(120, 10);
         app.stage.addChild(this.livesLabel.getGraphics());
+    }
 
+    private fillImageHierarchy() {
+        this.hierarchy = AsteroidImageHierarchy.fromJson(defaultAsteroidHierarchy);
+        console.log(this.hierarchy);
     }
 
     cleanUp(): void {
@@ -67,12 +81,12 @@ export default class PlayPage implements Page {
         this.scoreLabel.getGraphics().destroy();
     }
 
-    animate(time: Ticker): void {
+    advance(time: Ticker): void {
         this.asteroids.forEach(asteriod => {
             asteriod.advance(time, this.app.screen);
         });
         this.player.advance(time, this.app.screen);
-        this.bulletSpawner.animate(time);
+        this.bulletSpawner.advance(time);
         this.bullets.forEach(bullet => {
             bullet.advance(time, this.app.screen);
         });
@@ -107,6 +121,7 @@ export default class PlayPage implements Page {
     }
 
     addABullet() {
+        soundLoader.playSound(SoundId.BLASTER);
         const bullet = new Bullet(
             Entity.generateNextId(),
             config.bullet.bodyWidth,
@@ -125,15 +140,12 @@ export default class PlayPage implements Page {
         });
     }
 
-    createAsteroid(size: AsteroidSize, direction: PointData, position: PointData, baseSpeed: number) {
-        const asteroid = new Asteroid(
-            Entity.generateNextId(),
-            config.asteroids.baseAsteroidWidth,
+    createAsteroid(size: AsteroidSize, textureId: TextureId, direction: PointData, position: PointData) {
+        const asteroid = AsteroidFactory.createAsteroid(
             size,
+            textureId,
+            position,
             direction,
-            baseSpeed,
-            config.asteroids.scales,
-            config.asteroids.speeds
         );
 
         asteroid.setPosition({
@@ -171,28 +183,25 @@ export default class PlayPage implements Page {
     }
 
     breakDownAsteroid(asteroid: Asteroid) {
-        if (asteroid.getGraphics().destroyed) {
-            return;
-        }
-
         const asteroidPosition = {
             x: asteroid.getPosition().x,
             y: asteroid.getPosition().y
         };
+
         this.removeAsteroid(asteroid);
 
         if (asteroid.getAsteroidSize() != AsteroidSize.SMALL) {
             this.asteroids.push(this.createAsteroid(
-                Asteroid.SmallerAsteroidSize(asteroid.getAsteroidSize()),
+                asteroid.getAsteroidSize() - 1,
+                this.hierarchy.getRandomNextLevelTexture(asteroid.getTexture())!,
                 rotateVector(this.player.getDirection(), Math.PI / 4),
-                asteroidPosition,
-                asteroid.getMovableEntity().getSpeed()));
+                asteroidPosition));
 
             this.asteroids.push(this.createAsteroid(
-                Asteroid.SmallerAsteroidSize(asteroid.getAsteroidSize()),
+                asteroid.getAsteroidSize() - 1,
+                this.hierarchy.getRandomNextLevelTexture(asteroid.getTexture())!,
                 rotateVector(this.player.getDirection(), -Math.PI / 4),
-                asteroidPosition,
-                asteroid.getMovableEntity().getSpeed()));
+                asteroidPosition));
         }
     }
 
@@ -223,6 +232,7 @@ export default class PlayPage implements Page {
     }
 
     handleBulletToAsteroidCollision(bullet: Bullet, asteroidEntityId: number) {
+        soundLoader.playSound(SoundId.SLAP);
         const asteroid = this.asteroids.find(x => x.getEntityId() == asteroidEntityId);
         if (asteroid == null) {
             throw Error('Asteroid should be hit, but it does not exist')

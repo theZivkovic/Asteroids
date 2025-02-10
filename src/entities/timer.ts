@@ -16,7 +16,7 @@ export default class Timer {
         this.stopped = false;
     }
 
-    animate(time: Ticker) {
+    advance(time: Ticker) {
         if (this.isRunning()) {
             this.currentTimeMs += time.deltaMS;
             if (this.currentTimeMs >= this.endTimeMs) {

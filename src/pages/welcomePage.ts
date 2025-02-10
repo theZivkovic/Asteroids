@@ -28,7 +28,7 @@ export default class WelcomePage implements Page {
         this.pressSpaceLabel.destroy();
     }
 
-    animate(time: Ticker): void {
+    advance(time: Ticker): void {
         this.pressSpaceLabelTimeCounter = (this.pressSpaceLabelTimeCounter + time.deltaTime * 0.05) % Math.PI;
         this.pressSpaceLabel.style.fontSize = this.pressSpaceLabelInitialFontSize * Math.sin(Math.PI / 3 + this.pressSpaceLabelTimeCounter % Math.PI / 3);
     }

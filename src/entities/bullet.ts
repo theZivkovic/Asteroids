@@ -4,7 +4,7 @@ import eventEmitter from "../eventEmitter";
 import Events from "../events";
 import Entity from "./entity";
 import { Collidable } from "./collidable";
-import { AssetId, assetLoader } from "../assetLoader";
+import { TextureId, textureLoader } from "../textureLoader";
 
 export default class Bullet implements Collidable {
     private entity: Entity;
@@ -15,7 +15,7 @@ export default class Bullet implements Collidable {
         const thisPosition = { x: playerTopPosition.x, y: playerTopPosition.y }
         this.entity = new Entity(entityId);
 
-        this.sprite = new Sprite(assetLoader.getTexture(AssetId.HAND));
+        this.sprite = new Sprite(textureLoader.getTexture(TextureId.HAND));
         this.sprite.width = bodyWidth;
         this.sprite.height = bodyHeight;
         this.sprite.anchor = 0.5;

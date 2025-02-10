@@ -1,15 +1,14 @@
 import { Bounds, Container, ContainerChild, PointData, Rectangle, Sprite, Ticker, ViewContainer } from "pixi.js";
 import MovableEntity from "./movableEntity";
 import EntityThatPassedThroughWalls from "./entityThatPassedThroughWalls";
-import { AsteroidScalesConfig, AsteroidSpeedsConfig } from "../config";
 import Entity from "./entity";
 import { Collidable } from "./collidable";
-import { AssetId, assetLoader } from "../assetLoader";
+import { TextureId, textureLoader } from "../textureLoader";
 
 enum AsteroidSize {
-    BIG,
-    MEDIUM,
-    SMALL
+    BIG = 2,
+    MEDIUM = 1,
+    SMALL = 0
 };
 
 class Asteroid implements Collidable {
@@ -18,11 +17,12 @@ class Asteroid implements Collidable {
     private entityThatPassesThroughtWalls: EntityThatPassedThroughWalls;
     private asteroidSize: AsteroidSize;
     private graphics: ViewContainer;
+    private textureId: TextureId;
 
-    constructor(entityId: number, baseAsteroidWidth: number, asteroidSize: AsteroidSize, direction: PointData, baseAsteroidSpeed: number, scales: AsteroidScalesConfig, speeds: AsteroidSpeedsConfig) {
+    constructor(entityId: number, bodyWidth: number, textureId: TextureId, asteroidSize: AsteroidSize, direction: PointData, speed: number) {
+        this.textureId = textureId;
         this.asteroidSize = asteroidSize;
-        const speed = this.calculateSpeedBaseOnSize(baseAsteroidSpeed, asteroidSize, speeds);
-        this.graphics = this.createGraphicsBySize(baseAsteroidWidth, asteroidSize, scales);
+        this.graphics = this.createSprite(bodyWidth, textureId);
         this.entity = new Entity(entityId);
         this.movableEntity = new MovableEntity(this.graphics.position, direction, speed);
         this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(this.graphics.position, direction);
@@ -32,13 +32,8 @@ class Asteroid implements Collidable {
         return this.graphics.destroyed ? undefined : this.graphics.getBounds();
     }
 
-    calculateSpeedBaseOnSize(baseSpeed: number, asteriodSize: AsteroidSize, speeds: AsteroidSpeedsConfig) {
-        switch (asteriodSize) {
-            case AsteroidSize.BIG: return baseSpeed * speeds.big;
-            case AsteroidSize.MEDIUM: return baseSpeed * speeds.medium;
-            case AsteroidSize.SMALL: return baseSpeed * speeds.small;
-            default: return baseSpeed;
-        }
+    getTexture(): TextureId {
+        return this.textureId;
     }
 
     addToStage(stage: Container<ContainerChild>) {
@@ -57,39 +52,12 @@ class Asteroid implements Collidable {
         return this.movableEntity.getPosition();
     }
 
-    createGraphicsBySize(bigAsteroidWidth: number, asteroidSize: AsteroidSize, scales: AsteroidScalesConfig) {
-
-
-
-        switch (asteroidSize) {
-
-            case AsteroidSize.BIG: {
-                const sprite = new Sprite(assetLoader.getTexture(AssetId.ASTEROID));
-                sprite.width = bigAsteroidWidth;
-                sprite.height = bigAsteroidWidth;
-                sprite.anchor = 0.5;
-                return sprite;
-            }
-            case AsteroidSize.MEDIUM: {
-                const sprite = new Sprite(assetLoader.getTexture(AssetId.ASTEROID));
-                sprite.width = bigAsteroidWidth;
-                sprite.height = bigAsteroidWidth;
-                sprite.scale.x *= scales.medium;
-                sprite.scale.y *= scales.medium;
-                sprite.anchor = 0.5;
-                return sprite;
-            }
-            case AsteroidSize.SMALL: {
-                const sprite = new Sprite(assetLoader.getTexture(AssetId.ASTEROID));
-                sprite.width = bigAsteroidWidth;
-                sprite.height = bigAsteroidWidth;
-                sprite.scale.x *= scales.small;
-                sprite.scale.y *= scales.small;
-                sprite.anchor = 0.5;
-                return sprite;
-            }
-            default: throw new Error(`asteroid size: ${asteroidSize} not supported for creation`);
-        }
+    private createSprite(bodyWidth: number, textureId: TextureId) {
+        const sprite = new Sprite(textureLoader.getTexture(textureId));
+        sprite.width = bodyWidth;
+        sprite.height = bodyWidth;
+        sprite.anchor = 0.5;
+        return sprite;
     }
 
     getAsteroidSize() {
@@ -97,8 +65,7 @@ class Asteroid implements Collidable {
     }
 
     getMovableEntity() {
-        return this.movableEntity
-            ;
+        return this.movableEntity;
     }
 
     advance(time: Ticker, screen: Rectangle) {
@@ -109,18 +76,6 @@ class Asteroid implements Collidable {
 
     getEntityId() {
         return this.entity.getId();
-    }
-
-    static SmallerAsteroidSize(asteroidSize: AsteroidSize) {
-        switch (asteroidSize) {
-            case AsteroidSize.BIG: return AsteroidSize.MEDIUM;
-            case AsteroidSize.MEDIUM: return AsteroidSize.SMALL;
-            default: throw new Error(`There are no smaller asteroid sizes than ${asteroidSize}`);
-        }
-    }
-
-    getGraphics() {
-        return this.graphics;
     }
 }
 

@@ -8,7 +8,7 @@ enum PageId {
 interface Page {
     initialize(app: Application<Renderer>): void;
     cleanUp(): void;
-    animate(time: Ticker): void;
+    advance(time: Ticker): void;
     handleKeyDown(evt: KeyboardEvent): void;
     handleKeyUp(evt: KeyboardEvent): void;
     getPageId(): PageId

@@ -20,8 +20,8 @@ export default class GameManager {
         this.currentPage.initialize(app);
     }
 
-    animate(time: Ticker): void {
-        this.currentPage.animate(time);
+    advance(time: Ticker): void {
+        this.currentPage.advance(time);
     }
 
     handleKeyDown(evt: KeyboardEvent) {

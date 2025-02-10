@@ -17,7 +17,7 @@ export default class BulletSpawner {
         this.isShooting = true;
     }
 
-    animate(time: Ticker): void {
+    advance(time: Ticker): void {
         if (!this.isShooting) {
             return;
         }
