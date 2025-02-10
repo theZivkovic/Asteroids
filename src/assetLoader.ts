@@ -1,6 +1,7 @@
 import { Assets, Texture, TextureSource } from "pixi.js";
 
 enum AssetId {
+    HAND = 'HAND',
     BIG_VUCIC = "BIG_VUCIC",
 }
 
@@ -11,6 +12,7 @@ class AssetLoader {
 
     constructor() {
         this.assetIdToFilePath.set(AssetId.BIG_VUCIC, 'assets/asteroids/big_vucic.png');
+        this.assetIdToFilePath.set(AssetId.HAND, 'assets/hand.png');
     }
 
     async loadAll() {

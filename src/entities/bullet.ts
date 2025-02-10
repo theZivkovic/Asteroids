@@ -1,23 +1,32 @@
-import { Bounds, Container, ContainerChild, Graphics, PointData, Rectangle, Ticker } from "pixi.js";
+import { Bounds, Container, ContainerChild, PointData, Rectangle, Sprite, Ticker } from "pixi.js";
 import MovableEntity from "./movableEntity";
 import eventEmitter from "../eventEmitter";
 import Events from "../events";
 import Entity from "./entity";
 import { Collidable } from "./collidable";
+import { AssetId, assetLoader } from "../assetLoader";
 
 export default class Bullet implements Collidable {
     private entity: Entity;
     private movableEntity: MovableEntity;
-    private graphics: Graphics;
+    private sprite: Sprite;
 
-    constructor(entityId: number, graphics: Graphics, direction: PointData, speed: number) {
+    constructor(entityId: number, bodyWidth: number, bodyHeight: number, playerTopPosition: PointData, direction: PointData, speed: number) {
+        const thisPosition = { x: playerTopPosition.x, y: playerTopPosition.y }
         this.entity = new Entity(entityId);
-        this.movableEntity = new MovableEntity(graphics.position, { x: direction.x, y: direction.y }, speed);
-        this.graphics = graphics;
+
+        this.sprite = new Sprite(assetLoader.getTexture(AssetId.HAND));
+        this.sprite.width = bodyWidth;
+        this.sprite.height = bodyHeight;
+        this.sprite.anchor = 0.5;
+        this.sprite.rotation = Math.atan2(direction.y, direction.x) + Math.PI / 2;
+        this.sprite.position.set(thisPosition.x, thisPosition.y);
+
+        this.movableEntity = new MovableEntity(this.sprite.position, { x: direction.x, y: direction.y }, speed);
     }
 
     getBounds(): Bounds | undefined {
-        return this.graphics.destroyed ? undefined : this.graphics.getBounds();
+        return this.sprite.destroyed ? undefined : this.sprite.getBounds();
     }
 
     setPosition(newPosition: PointData) {
@@ -29,11 +38,11 @@ export default class Bullet implements Collidable {
     }
 
     addToStage(stage: Container<ContainerChild>) {
-        stage.addChild(this.graphics);
+        stage.addChild(this.sprite);
     }
 
     destroy() {
-        this.graphics.destroy();
+        this.sprite.destroy();
     }
 
     advance(time: Ticker, screen: Rectangle,) {
@@ -47,9 +56,5 @@ export default class Bullet implements Collidable {
 
     getEntityId() {
         return this.entity.getId();
-    }
-
-    getGraphics() {
-        return this.graphics;
     }
 }

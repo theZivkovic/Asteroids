@@ -21,6 +21,7 @@ export default class Player implements Collidable {
     private acceleration: number;
     private maxSpeed: number;
     private graphics: Graphics;
+    private bodyHeight: number;
 
     constructor(entityId: number, initialPosition: PointData, direction: PointData, rotationSpeed: number,
         bodyWidth: number, bodyHeight: number, bodyColor: number, fireColor: number, cooldownColor: number,
@@ -46,6 +47,7 @@ export default class Player implements Collidable {
         this.cooldownTimer = new Timer(cooldownTimeMs);
         this.acceleration = acceleration;
         this.maxSpeed = maxSpeed;
+        this.bodyHeight = bodyHeight;
     }
 
     getBounds(): Bounds | undefined {
@@ -152,5 +154,12 @@ export default class Player implements Collidable {
 
     getPosition() {
         return this.movableEntity.getPosition();
+    }
+
+    getTopPoint() {
+        return {
+            x: this.movableEntity.getPosition().x + this.getDirection().x * this.bodyHeight / 2.0,
+            y: this.movableEntity.getPosition().y + this.getDirection().y * this.bodyHeight / 2.0
+        }
     }
 }

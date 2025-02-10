@@ -41,6 +41,11 @@ const config = {
             medium: 20,
             small: 30
         }
+    },
+    bullet: {
+        bodyWidth: 30,
+        bodyHeight: 30,
+        speed: 5
     }
 }
 

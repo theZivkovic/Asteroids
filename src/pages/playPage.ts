@@ -1,6 +1,5 @@
-import { Application, Graphics, PointData, Renderer, Ticker } from "pixi.js";
+import { Application, PointData, Renderer, Ticker } from "pixi.js";
 import { Page, PageId } from "./page";
-import { createCircleContent } from "../graphicsContentsFactory";
 import { Asteroid, AsteroidSize } from "../entities/asteroid";
 import Player from "../entities/player";
 import BulletSpawner from "../entities/bulletSpawner";
@@ -108,9 +107,14 @@ export default class PlayPage implements Page {
     }
 
     addABullet() {
-        const bulletGraphics = new Graphics(createCircleContent(2));
-        bulletGraphics.position = this.player.getMovableEntity().getPosition();
-        const bullet = new Bullet(Entity.generateNextId(), bulletGraphics, this.player.getDirection(), 5);
+        const bullet = new Bullet(
+            Entity.generateNextId(),
+            config.bullet.bodyWidth,
+            config.bullet.bodyHeight,
+            this.player.getTopPoint(),
+            this.player.getDirection(),
+            config.bullet.speed);
+
         bullet.addToStage(this.app.stage);
         this.bullets.push(bullet);
         this.asteroids.forEach(asteroid => {
