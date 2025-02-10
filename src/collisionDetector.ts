@@ -1,20 +1,19 @@
 import { Bounds } from "pixi.js";
-import GraphicalEntity from "./entities/graphicalEntity";
 import eventEmitter from "./eventEmitter";
 import Events from "./events";
+import { Collidable } from "./entities/collidable";
 
-export default class CollisionDetector {
+class CollisionDetector {
+    tracker: Map<Collidable, Array<Collidable>> = new Map<Collidable, Array<Collidable>>();
 
-    tracker: Map<GraphicalEntity, Array<GraphicalEntity>> = new Map<GraphicalEntity, Array<GraphicalEntity>>();
-
-    track(leftEntity: GraphicalEntity, rightEntity: GraphicalEntity) {
+    track(leftEntity: Collidable, rightEntity: Collidable) {
         if (!this.tracker.has(leftEntity)) {
             this.tracker.set(leftEntity, []);
         }
         this.tracker.get(leftEntity)!.push(rightEntity);
     }
 
-    untrackRight(rightEntity: GraphicalEntity) {
+    untrackRight(rightEntity: Collidable) {
         for (const [leftEntity, rightEntities] of this.tracker) {
             const rightEntityIndex = rightEntities.indexOf(rightEntity);
             if (rightEntityIndex >= 0) {
@@ -26,7 +25,7 @@ export default class CollisionDetector {
         }
     }
 
-    untrackLeft(leftEntity: GraphicalEntity) {
+    untrackLeft(leftEntity: Collidable) {
         this.tracker.delete(leftEntity);
     }
 
@@ -34,17 +33,17 @@ export default class CollisionDetector {
         for (const [leftEntity, rightEntities] of this.tracker) {
             for (const rightEntity of rightEntities) {
 
-                if (leftEntity.getGraphics().destroyed || rightEntity.getGraphics().destroyed) {
-                    continue; // see how to remove this check (not sure why entities are not properly destroyed at this moment)
+                if (!leftEntity.getBounds() || !rightEntity.getBounds()) {
+                    continue;
                 }
 
                 if (this.areColliding(
-                    leftEntity.getGraphics().getBounds(),
-                    rightEntity.getGraphics().getBounds()
+                    leftEntity.getBounds()!,
+                    rightEntity.getBounds()!
                 )) {
                     eventEmitter.emit(Events.COLLISION_DETECTED, {
-                        leftEntityId: leftEntity.getId(),
-                        rightEntityId: rightEntity.getId()
+                        leftEntityId: leftEntity.getEntityId(),
+                        rightEntityId: rightEntity.getEntityId()
                     });
                 }
 
@@ -59,3 +58,5 @@ export default class CollisionDetector {
             && a.y + a.height > b.y
     }
 }
+
+export { CollisionDetector }

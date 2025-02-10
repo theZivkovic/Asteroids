@@ -1,12 +1,12 @@
-import { Graphics, PointData, Ticker } from "pixi.js";
+import { ObservablePoint, PointData, Ticker } from "pixi.js";
 
 export default class MovableEntity {
-    private graphics: Graphics = null!;
-    private direction: PointData = null!;
+    private position: ObservablePoint;
+    private direction: PointData;
     private speed: number = 1;
 
-    constructor(graphics: Graphics, direction: PointData, speed: number) {
-        this.graphics = graphics;
+    constructor(position: ObservablePoint, direction: PointData, speed: number) {
+        this.position = position;
         this.direction = direction;
         this.speed = speed;
     }
@@ -28,14 +28,22 @@ export default class MovableEntity {
         this.speed = speed;
     }
 
+    setPosition(newPosition: PointData) {
+        this.position.x = newPosition.x;
+        this.position.y = newPosition.y;
+    }
+
+    getPosition() {
+        return this.position;
+    }
+
     advance(time: Ticker) {
-        if (this.graphics.destroyed) { return; }
         const newPosition: PointData = {
-            x: this.graphics.position.x + this.direction.x * this.speed * time.deltaTime,
-            y: this.graphics.position.y + this.direction.y * this.speed * time.deltaTime
+            x: this.position.x + this.direction.x * this.speed * time.deltaTime,
+            y: this.position.y + this.direction.y * this.speed * time.deltaTime
         };
 
-        this.graphics.position.set(
+        this.position.set(
             newPosition.x,
             newPosition.y
         );

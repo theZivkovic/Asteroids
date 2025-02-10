@@ -6,7 +6,7 @@ import Player from "../entities/player";
 import BulletSpawner from "../entities/bulletSpawner";
 import Bullet from "../entities/bullet";
 import Entity from "../entities/entity";
-import CollisionDetector from "../collisionDetector";
+import { CollisionDetector } from "../collisionDetector";
 import { rotateVector } from "../helpers/vectorHelpers";
 import ScoreLabel from "../entities/scoreLabel";
 import LivesLabel from "../entities/livesLabel";
@@ -109,13 +109,16 @@ export default class PlayPage implements Page {
 
     addABullet() {
         const bulletGraphics = new Graphics(createCircleContent(2));
-        bulletGraphics.position = this.player.getGraphicalEntity().getGraphics().position;
+        bulletGraphics.position = this.player.getMovableEntity().getPosition();
         const bullet = new Bullet(Entity.generateNextId(), bulletGraphics, this.player.getDirection(), 5);
         bullet.addToStage(this.app.stage);
         this.bullets.push(bullet);
         this.asteroids.forEach(asteroid => {
-            this.collisionDetector.track(bullet.getGraphicalEntity(), asteroid.getGraphicalEntity());
-        })
+            this.collisionDetector.track(
+                bullet,
+                asteroid
+            );
+        });
     }
 
     createAsteroid(size: AsteroidSize, direction: PointData, position: PointData, baseSpeed: number) {
@@ -137,9 +140,7 @@ export default class PlayPage implements Page {
         this.asteroids.push(asteroid);
         asteroid.addToStage(this.app.stage);
 
-        this.collisionDetector.track(
-            this.player.getGraphicalEntity(),
-            asteroid.getGraphicalEntity());
+        this.collisionDetector.track(this.player, asteroid);
 
         return asteroid;
     }
@@ -148,7 +149,7 @@ export default class PlayPage implements Page {
         const bulletIndex = this.bullets.indexOf(bulletToRemove);
         if (bulletIndex < 0) { throw new Error(`can't find a bullet to remove, index: ${bulletIndex}, entityId: ${bulletToRemove.getEntityId()}`) }
         this.bullets.splice(bulletIndex, 1);
-        this.collisionDetector.untrackLeft(bulletToRemove.getGraphicalEntity());
+        this.collisionDetector.untrackLeft(bulletToRemove);
         bulletToRemove.destroy();
     }
 
@@ -159,14 +160,14 @@ export default class PlayPage implements Page {
     }
 
     removeAsteroid(asteroid: Asteroid) {
-        this.collisionDetector.untrackRight(asteroid.getGraphicalEntity());
+        this.collisionDetector.untrackRight(asteroid);
         const asteroidToRemoveIndex = this.asteroids.indexOf(asteroid);
         this.asteroids.splice(asteroidToRemoveIndex, 1);
         asteroid.destroy();
     }
 
     breakDownAsteroid(asteroid: Asteroid) {
-        if (asteroid.getGraphicalEntity().getGraphics().destroyed) {
+        if (asteroid.getGraphics().destroyed) {
             return;
         }
 
@@ -192,7 +193,7 @@ export default class PlayPage implements Page {
     }
 
     handleCollision(leftEntityId: number, rightEntityId: number) {
-        if (leftEntityId == this.player.getGraphicalEntity().getId()) {
+        if (leftEntityId == this.player.getEntityId()) {
             this.handlePlayerToAsteroidCollision(rightEntityId);
         } else {
             const bulletHit = this.bullets.find(x => x.getEntityId() == leftEntityId);

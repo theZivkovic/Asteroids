@@ -1,17 +1,18 @@
-import { Container, ContainerChild, Graphics, PointData, Rectangle, Ticker } from "pixi.js";
+import { Bounds, Container, ContainerChild, Graphics, PointData, Rectangle, Ticker } from "pixi.js";
 import MovableEntity from "./movableEntity";
 import EntityThatPassedThroughWalls from "./entityThatPassedThroughWalls";
-import GraphicalEntity from "./graphicalEntity";
 import { createFireEngineGraphics, createPlayerGraphics } from "../playerGraphics";
 import Timer from "./timer";
+import Entity from "./entity";
+import { Collidable } from "./collidable";
 
-export default class Player {
+export default class Player implements Collidable {
     private currentAcceleration: number;
     private rotationSpeed: number;
     private shouldRotate: boolean = false;
     private counterClockwiseRotation: boolean = false;
     private initialDirection: PointData;
-    private graphicalEntity: GraphicalEntity;
+    private entity: Entity;
     private movableEntity: MovableEntity;
     private entityThatPassesThroughtWalls: EntityThatPassedThroughWalls;
     private fireEngineGraphics: Graphics;
@@ -19,12 +20,14 @@ export default class Player {
     private playerCooldownGraphics: Graphics;
     private acceleration: number;
     private maxSpeed: number;
+    private graphics: Graphics;
 
     constructor(entityId: number, initialPosition: PointData, direction: PointData, rotationSpeed: number,
         bodyWidth: number, bodyHeight: number, bodyColor: number, fireColor: number, cooldownColor: number,
         cooldownTimeMs: number, acceleration: number, maxSpeed: number
     ) {
         const playerGraphics = createPlayerGraphics(initialPosition, bodyWidth, bodyHeight, bodyColor);
+        this.graphics = playerGraphics;
 
         this.playerCooldownGraphics = createPlayerGraphics(initialPosition, bodyWidth, bodyHeight, cooldownColor);
         this.playerCooldownGraphics.position.set(0, 0);
@@ -34,8 +37,8 @@ export default class Player {
         this.fireEngineGraphics = createFireEngineGraphics(bodyWidth, bodyHeight, fireColor);
         playerGraphics.addChild(this.fireEngineGraphics);
 
-        this.graphicalEntity = new GraphicalEntity(entityId, playerGraphics);
-        this.movableEntity = new MovableEntity(playerGraphics, direction, 0);
+        this.entity = new Entity(entityId);
+        this.movableEntity = new MovableEntity(playerGraphics.position, direction, 0);
         this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(playerGraphics, direction);
         this.initialDirection = { x: direction.x, y: direction.y };
         this.currentAcceleration = 0;
@@ -45,20 +48,24 @@ export default class Player {
         this.maxSpeed = maxSpeed;
     }
 
+    getBounds(): Bounds | undefined {
+        return this.graphics.destroyed ? undefined : this.graphics.getBounds();
+    }
+
     addToStage(stage: Container<ContainerChild>) {
-        stage.addChild(this.graphicalEntity.getGraphics());
+        stage.addChild(this.graphics);
     }
 
     destroy() {
-        this.graphicalEntity.getGraphics().destroy();
-    }
-
-    getGraphicalEntity() {
-        return this.graphicalEntity;
+        this.graphics.destroy();
     }
 
     getDirection() {
         return this.movableEntity.getDirection();
+    }
+
+    getMovableEntity() {
+        return this.movableEntity;
     }
 
     accelerate() {
@@ -87,7 +94,7 @@ export default class Player {
             y: Math.sin(newAngle)
         });
         const initialGraphicsRotation = Math.atan2(this.initialDirection.y, this.initialDirection.x)
-        this.graphicalEntity.getGraphics().rotation = newAngle - initialGraphicsRotation;
+        this.graphics.rotation = newAngle - initialGraphicsRotation;
     }
 
     startCooldown() {
@@ -102,10 +109,10 @@ export default class Player {
         if (this.cooldownTimer.isRunning()) {
             this.cooldownTimer.animate(time);
             this.playerCooldownGraphics.visible = !this.playerCooldownGraphics.visible;
-            this.graphicalEntity.getGraphics().visible = true;
+            this.graphics.visible = true;
         }
         else {
-            this.graphicalEntity.getGraphics().visible = true;
+            this.graphics.visible = true;
             this.playerCooldownGraphics.visible = false;
         }
         if (this.currentAcceleration > 0) {
@@ -129,5 +136,21 @@ export default class Player {
 
         this.movableEntity.advance(time);
         this.entityThatPassesThroughtWalls.advance(screen);
+    }
+
+    getEntityId() {
+        return this.entity.getId();
+    }
+
+    getGraphics() {
+        return this.graphics;
+    }
+
+    setPosition(newPosition: PointData) {
+        this.movableEntity.setPosition(newPosition);
+    }
+
+    getPosition() {
+        return this.movableEntity.getPosition();
     }
 }

@@ -1,9 +1,10 @@
-import { Container, ContainerChild, Graphics, PointData, Rectangle, Ticker } from "pixi.js";
+import { Bounds, Container, ContainerChild, Graphics, PointData, Rectangle, Ticker } from "pixi.js";
 import MovableEntity from "./movableEntity";
 import EntityThatPassedThroughWalls from "./entityThatPassedThroughWalls";
-import GraphicalEntity from "./graphicalEntity";
 import { createCircleContent } from "../graphicsContentsFactory";
 import { AsteroidScalesConfig, AsteroidSpeedsConfig } from "../config";
+import Entity from "./entity";
+import { Collidable } from "./collidable";
 
 enum AsteroidSize {
     BIG,
@@ -11,19 +12,24 @@ enum AsteroidSize {
     SMALL
 };
 
-class Asteroid {
-    private graphicalEntity: GraphicalEntity;
+class Asteroid implements Collidable {
+    private entity: Entity;
     private movableEntity: MovableEntity;
     private entityThatPassesThroughtWalls: EntityThatPassedThroughWalls;
     private asteroidSize: AsteroidSize;
+    private graphics: Graphics;
 
     constructor(entityId: number, baseAsteroidWidth: number, asteroidSize: AsteroidSize, direction: PointData, baseAsteroidSpeed: number, scales: AsteroidScalesConfig, speeds: AsteroidSpeedsConfig) {
         this.asteroidSize = asteroidSize;
         const speed = this.calculateSpeedBaseOnSize(baseAsteroidSpeed, asteroidSize, speeds);
-        const graphics = this.createGraphicsBySize(baseAsteroidWidth, asteroidSize, scales);
-        this.graphicalEntity = new GraphicalEntity(entityId, graphics);
-        this.movableEntity = new MovableEntity(graphics, direction, speed);
-        this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(graphics, direction);
+        this.graphics = this.createGraphicsBySize(baseAsteroidWidth, asteroidSize, scales);
+        this.entity = new Entity(entityId);
+        this.movableEntity = new MovableEntity(this.graphics.position, direction, speed);
+        this.entityThatPassesThroughtWalls = new EntityThatPassedThroughWalls(this.graphics, direction);
+    }
+
+    getBounds(): Bounds | undefined {
+        return this.graphics.destroyed ? undefined : this.graphics.getBounds();
     }
 
     calculateSpeedBaseOnSize(baseSpeed: number, asteriodSize: AsteroidSize, speeds: AsteroidSpeedsConfig) {
@@ -36,19 +42,19 @@ class Asteroid {
     }
 
     addToStage(stage: Container<ContainerChild>) {
-        stage.addChild(this.getGraphicalEntity().getGraphics());
+        stage.addChild(this.graphics);
     }
 
     destroy() {
-        this.getGraphicalEntity().getGraphics().destroy();
+        this.graphics.destroy();
     }
 
     setPosition(newPosition: PointData) {
-        this.graphicalEntity.getGraphics().position.set(newPosition.x, newPosition.y);
+        this.movableEntity.setPosition(newPosition);
     }
 
     getPosition() {
-        return this.graphicalEntity.getGraphics().position;
+        return this.movableEntity.getPosition();
     }
 
     createGraphicsBySize(bigAsteroidWidth: number, asteroidSize: AsteroidSize, scales: AsteroidScalesConfig) {
@@ -90,11 +96,7 @@ class Asteroid {
     }
 
     getEntityId() {
-        return this.graphicalEntity.getId();
-    }
-
-    getGraphicalEntity() {
-        return this.graphicalEntity;
+        return this.entity.getId();
     }
 
     static SmallerAsteroidSize(asteroidSize: AsteroidSize) {
@@ -103,6 +105,10 @@ class Asteroid {
             case AsteroidSize.MEDIUM: return AsteroidSize.SMALL;
             default: throw new Error(`There are no smaller asteroid sizes than ${asteroidSize}`);
         }
+    }
+
+    getGraphics() {
+        return this.graphics;
     }
 }
 
