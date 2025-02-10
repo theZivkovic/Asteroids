@@ -6,14 +6,14 @@ import { Ticker } from "pixi.js";
 export default class BulletSpawner {
 
     player: Player;
-    spawnInterval: number;
-    spawnTimer: number;
+    spawnIntervalMs: number;
+    spawnTimerMs: number;
     isShooting: boolean;
 
     constructor(player: Player, spawnInterval: number) {
         this.player = player;
-        this.spawnInterval = spawnInterval;
-        this.spawnTimer = 0;
+        this.spawnIntervalMs = spawnInterval;
+        this.spawnTimerMs = 0;
         this.isShooting = true;
     }
 
@@ -21,10 +21,10 @@ export default class BulletSpawner {
         if (!this.isShooting) {
             return;
         }
-        this.spawnTimer += time.deltaTime;
-        if (this.spawnTimer >= this.spawnInterval) {
+        this.spawnTimerMs += time.deltaMS;
+        if (this.spawnTimerMs >= this.spawnIntervalMs) {
             this.spawnBullet();
-            this.spawnTimer = this.spawnTimer - this.spawnInterval;
+            this.spawnTimerMs = this.spawnTimerMs - this.spawnIntervalMs;
         }
     }
 

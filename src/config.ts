@@ -24,7 +24,7 @@ const config = {
         maxSpeed: 6
     },
     asteroids: {
-        initialCount: 5,
+        initialCount: 15,
         baseAsteroidWidth: 150,
         scales: {
             big: 1.5,
@@ -45,7 +45,8 @@ const config = {
     bullet: {
         bodyWidth: 30,
         bodyHeight: 30,
-        speed: 5
+        speed: 5,
+        spawnInterval: 300
     }
 }
 

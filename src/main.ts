@@ -18,13 +18,6 @@ import { assetLoader } from "./assetLoader";
   // Append the application canvas to the document body
   document.getElementById("pixi-container")!.appendChild(app.canvas);
 
-  // const sprite = new Sprite(assetLoader.getTexture(AssetId.BIG_VUCIC));
-  // sprite.width = 50;
-  // sprite.height = 50;
-  // sprite.x = 20;
-  // sprite.y = 20;
-  // app.stage.addChild(sprite);
-
   // Load the bunny texture
   const texture = await Assets.load("/assets/bunny.png");
 

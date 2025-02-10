@@ -48,7 +48,7 @@ export default class PlayPage implements Page {
                 0.7 + Math.random() * 0.5
             ));
 
-        this.bulletSpawner = new BulletSpawner(this.player, 10);
+        this.bulletSpawner = new BulletSpawner(this.player, config.bullet.spawnInterval);
         this.bullets = [];
         this.scoreLabel = new ScoreLabel();
         this.scoreLabel.getGraphics().position.set(5, 10);
