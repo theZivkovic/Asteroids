@@ -59,20 +59,33 @@ class Asteroid implements Collidable {
 
     createGraphicsBySize(bigAsteroidWidth: number, asteroidSize: AsteroidSize, scales: AsteroidScalesConfig) {
 
-        const sprite = new Sprite(assetLoader.getTexture(AssetId.BIG_VUCIC));
-        sprite.width = bigAsteroidWidth;
-        sprite.height = bigAsteroidWidth;
+
 
         switch (asteroidSize) {
-            case AsteroidSize.BIG: return sprite;
+
+            case AsteroidSize.BIG: {
+                const sprite = new Sprite(assetLoader.getTexture(AssetId.BIG_VUCIC));
+                sprite.width = bigAsteroidWidth;
+                sprite.height = bigAsteroidWidth;
+                sprite.anchor = 0.5;
+                return sprite;
+            }
             case AsteroidSize.MEDIUM: {
+                const sprite = new Sprite(assetLoader.getTexture(AssetId.MEDIUM_BRNABIC));
+                sprite.width = bigAsteroidWidth;
+                sprite.height = bigAsteroidWidth;
                 sprite.scale.x *= scales.medium;
                 sprite.scale.y *= scales.medium;
+                sprite.anchor = 0.5;
                 return sprite;
             }
             case AsteroidSize.SMALL: {
+                const sprite = new Sprite(assetLoader.getTexture(AssetId.SMALL_SAPIC));
+                sprite.width = bigAsteroidWidth;
+                sprite.height = bigAsteroidWidth;
                 sprite.scale.x *= scales.small;
                 sprite.scale.y *= scales.small;
+                sprite.anchor = 0.5;
                 return sprite;
             }
             default: throw new Error(`asteroid size: ${asteroidSize} not supported for creation`);

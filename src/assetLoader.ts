@@ -3,6 +3,8 @@ import { Assets, Texture, TextureSource } from "pixi.js";
 enum AssetId {
     HAND = 'HAND',
     BIG_VUCIC = "BIG_VUCIC",
+    MEDIUM_BRNABIC = "MEDIUM_BRNABIC",
+    SMALL_SAPIC = "SMALL_SAPIC"
 }
 
 class AssetLoader {
@@ -12,6 +14,8 @@ class AssetLoader {
 
     constructor() {
         this.assetIdToFilePath.set(AssetId.BIG_VUCIC, 'assets/asteroids/big_vucic.png');
+        this.assetIdToFilePath.set(AssetId.MEDIUM_BRNABIC, 'assets/asteroids/medium_brnabic.png')
+        this.assetIdToFilePath.set(AssetId.SMALL_SAPIC, 'assets/asteroids/small_sapic.png')
         this.assetIdToFilePath.set(AssetId.HAND, 'assets/hand.png');
     }
 

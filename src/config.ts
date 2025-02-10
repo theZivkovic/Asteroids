@@ -29,12 +29,12 @@ const config = {
         scales: {
             big: 1.5,
             medium: 0.7,
-            small: 0.2
+            small: 0.4
         },
         speeds: {
             big: 0.7,
             medium: 1.0,
-            small: 1.2
+            small: 1.4
         },
         points: {
             big: 10,
